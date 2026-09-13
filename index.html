@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>第四爱社区</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/@supabase/supabase-js@2" onerror="document.body.innerHTML='<div style=padding:40px;text-align:center;color:#c0392b>无法加载 Supabase SDK，请检查网络或刷新重试</div>'"></script>
   <style>
     :root {
       --bg: #faf6f4;
@@ -173,6 +173,10 @@
     // ===== 配置占位（等你拿到 Supabase 项目后填这里）=====
     const SUPABASE_URL = "https://eaadmvvpbelpzookqhwv.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_yeGWnZ4W0gGZlWT7QXg7sw_Hye-TjqD";
+    if (!window.supabase) {
+      document.body.innerHTML = '<div style="padding:40px;text-align:center;color:#c0392b">无法加载 Supabase SDK，请检查网络或刷新重试</div>';
+      throw new Error('Supabase SDK not loaded');
+    }
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let authMode = "login"; // login | signup
