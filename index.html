@@ -5,32 +5,265 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>第四爱社区</title>
   <style>
+    :root {
+      --bg: #faf6f4; --card: #ffffff; --ink: #3a2f33; --sub: #9a8b90;
+      --accent: #b76e79; --accent-soft: #f3e4e6; --line: #efe6e8; --danger: #c0392b;
+    }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, sans-serif; padding: 20px; background: #faf6f4; }
-    .loading { text-align: center; padding: 60px 20px; }
-    .loading h1 { font-size: 24px; margin-bottom: 20px; color: #3a2f33; }
-    .loading p { font-size: 16px; color: #9a8b90; margin: 10px 0; }
-    .status { background: #fff; border-radius: 12px; padding: 20px; margin-top: 20px; }
-    .ok { color: #27ae60; }
-    .err { color: #c0392b; }
+    body { background: var(--bg); color: var(--ink);
+      font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      -webkit-font-smoothing: antialiased; padding-bottom: 72px;
+    }
+    .hidden { display: none !important; }
+    .topbar { position: sticky; top: 0; background: rgba(255,255,255,.92);
+      backdrop-filter: blur(10px); border-bottom: 1px solid var(--line);
+      padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; z-index: 10;
+    }
+    .topbar .logo { font-weight: 700; font-size: 17px; letter-spacing: .5px; }
+    .topbar .logo span { color: var(--accent); }
+    .topbar .user-box { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+    .topbar .user-box .nick { color: var(--sub); }
+    .topbar .btn { background: var(--accent); color: #fff; border: none;
+      padding: 7px 14px; border-radius: 18px; font-size: 13px; cursor: pointer;
+    }
+    .topbar .btn.ghost { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+    .auth-wrap { max-width: 420px; margin: 40px auto 0; padding: 0 20px; }
+    .auth-card { background: var(--card); border-radius: 16px; padding: 28px 22px;
+      box-shadow: 0 4px 16px rgba(0,0,0,.06);
+    }
+    .auth-card h2 { font-size: 19px; margin-bottom: 4px; }
+    .auth-card .hint { font-size: 13px; color: var(--sub); margin-bottom: 20px; }
+    .switch-tabs { display: flex; gap: 0; margin-bottom: 20px; border-bottom: 1px solid var(--line); }
+    .switch-tabs .st { flex: 1; text-align: center; padding: 10px 0; font-size: 14px; color: var(--sub); cursor: pointer; }
+    .switch-tabs .st.on { color: var(--accent); font-weight: 600; border-bottom: 2px solid var(--accent); }
+    .field { margin-bottom: 14px; }
+    .field label { display: block; font-size: 13px; color: var(--sub); margin-bottom: 6px; }
+    .field input { width: 100%; padding: 11px 12px; border: 1px solid var(--line); border-radius: 10px;
+      font-size: 15px; outline: none; background: #fdfbfa;
+    }
+    .field input:focus { border-color: var(--accent); }
+    .submit { width: 100%; padding: 12px; background: var(--accent); color: #fff;
+      border: none; border-radius: 10px; font-size: 15px; cursor: pointer; margin-top: 6px;
+    }
+    .submit:active { opacity: .85; }
+    .msg { font-size: 13px; margin-top: 12px; text-align: center; min-height: 18px; }
+    .msg.err { color: var(--danger); }
+    .msg.ok { color: #27ae60; }
+    .tabs { display: flex; gap: 20px; padding: 12px 18px 0; font-size: 14px; }
+    .tabs .tab { color: var(--sub); cursor: pointer; padding-bottom: 8px; }
+    .tabs .tab.on { color: var(--accent); font-weight: 600; border-bottom: 2px solid var(--accent); }
+    .feed { padding: 12px 14px; display: flex; flex-direction: column; gap: 12px; }
+    .post { background: var(--card); border-radius: 14px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+    .post .head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .avatar { width: 38px; height: 38px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 700; color: #fff;
+    }
+    .post .meta { display: flex; flex-direction: column; }
+    .post .name { font-size: 14px; font-weight: 600; }
+    .post .time { font-size: 12px; color: var(--sub); }
+    .post .text { font-size: 15px; line-height: 1.6; margin-bottom: 10px; }
+    .tag { display: inline-block; background: var(--accent-soft); color: var(--accent);
+      font-size: 12px; padding: 2px 10px; border-radius: 10px; margin-right: 6px;
+    }
+    .post .actions { display: flex; gap: 18px; margin-top: 10px; color: var(--sub); font-size: 13px; }
+    .fab { position: fixed; right: 18px; bottom: 20px; width: 54px; height: 54px;
+      background: var(--accent); color: #fff; border: none; border-radius: 50%;
+      font-size: 26px; cursor: pointer; box-shadow: 0 6px 18px rgba(183,110,121,.4);
+    }
   </style>
 </head>
 <body>
-  <div class="loading">
-    <h1>第四爱·社区</h1>
-    <p>正在加载...</p>
-    <div class="status" id="status">
-      <p>1️⃣ HTML 加载: <span class="ok">✅ 成功</span></p>
-      <p id="step2">2️⃣ 检测 JS 支持...</p>
-      <p id="step3">3️⃣ 加载 Supabase SDK...</p>
+  <div class="topbar">
+    <div class="logo">第四爱<span>·</span>社区</div>
+    <div class="user-box hidden" id="userBox">
+      <span class="nick" id="nickName"></span>
+      <button class="btn ghost" id="logoutBtn">退出</button>
+    </div>
+    <button class="btn hidden" id="loginEntry">登录 / 注册</button>
+  </div>
+  <div class="auth-wrap hidden" id="authWrap">
+    <div class="auth-card">
+      <h2 id="authTitle">登录</h2>
+      <div class="hint">用邮箱和密码登录社区</div>
+      <div class="switch-tabs">
+        <div class="st on" id="tabLogin">登录</div>
+        <div class="st" id="tabSignup">注册</div>
+      </div>
+      <div class="field">
+        <label>邮箱</label>
+        <input type="email" id="email" placeholder="you@example.com">
+      </div>
+      <div class="field">
+        <label>密码（至少 6 位）</label>
+        <input type="password" id="password" placeholder="••••••••">
+      </div>
+      <div class="field hidden" id="nickField">
+        <label>昵称</label>
+        <input type="text" id="nickname" placeholder="给自己起个名字">
+      </div>
+      <button class="submit" id="submitBtn">登录</button>
+      <div class="msg" id="msg"></div>
     </div>
   </div>
+  <div id="mainArea" class="hidden">
+    <div class="tabs">
+      <div class="tab on">推荐</div>
+      <div class="tab">关注</div>
+      <div class="tab">话题</div>
+    </div>
+    <div class="feed">
+      <div class="post">
+        <div class="head">
+          <div class="avatar" style="background:#b76e79;">岚</div>
+          <div class="meta"><div class="name">岚岚</div><div class="time">10 分钟前</div></div>
+        </div>
+        <div class="text">第四爱里最打动我的，从来不是谁压过谁，而是那种被稳稳托住的信任感。</div>
+        <span class="tag"># 关系讨论</span>
+        <div class="actions"><span>♥ 128</span><span>💬 32</span><span>↗ 分享</span></div>
+      </div>
+      <div class="post">
+        <div class="head">
+          <div class="avatar" style="background:#6e8fb7;">白</div>
+          <div class="meta"><div class="name">白桃乌龙</div><div class="time">1 小时前</div></div>
+        </div>
+        <div class="text">今天第一次鼓起勇气跟对象聊了角色期待，说开了才是开始。</div>
+        <span class="tag"># 日常</span>
+        <div class="actions"><span>♥ 76</span><span>💬 19</span><span>↗ 分享</span></div>
+      </div>
+    </div>
+    <button class="fab">＋</button>
+  </div>
   <script>
-    document.getElementById('step2').innerHTML = '2️⃣ JS 支持: <span class="ok">✅ 正常</span>';
-    setTimeout(() => {
-      document.getElementById('step3').innerHTML = '3️⃣ Supabase SDK: <span class="err">❌ 加载失败（网络问题）</span><br><small style="color:#9a8b90;margin-top:10px;display:block">你的网络访问不了 Supabase CDN，需要换方案</small>';
-    }, 2000);
+    const SUPABASE_URL = "https://eaadmvvpbelpzookqhwv.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_yeGWnZ4W0gGZlWT7QXg7sw_Hye-TjqD";
+    const STORAGE_KEY = "sb.auth.token";
+
+    const $ = id => document.getElementById(id);
+    let authMode = "login";
+
+    async function apiCall(endpoint, method = "GET", body = null) {
+      const headers = { "apikey": SUPABASE_KEY, "Content-Type": "application/json" };
+      const session = getStoredSession();
+      if (session?.access_token) headers.Authorization = `Bearer ${session.access_token}`;
+      const opts = { method, headers };
+      if (body) opts.body = JSON.stringify(body);
+      const res = await fetch(`${SUPABASE_URL}${endpoint}`, opts);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.msg || data.message || data.error_description || "请求失败");
+      return data;
+    }
+
+    function getStoredSession() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch { return null; }
+    }
+    function setStoredSession(session) {
+      if (session) localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+      else localStorage.removeItem(STORAGE_KEY);
+    }
+
+    async function signUp(email, password, nickname) {
+      const data = await apiCall("/auth/v1/signup", "POST", {
+        email, password, data: { nickname }
+      });
+      if (data.access_token) setStoredSession(data);
+      return data;
+    }
+
+    async function signIn(email, password) {
+      const data = await apiCall("/auth/v1/token?grant_type=password", "POST", { email, password });
+      if (data.access_token) setStoredSession(data);
+      return data;
+    }
+
+    async function signOut() {
+      try { await apiCall("/auth/v1/logout", "POST"); } catch {}
+      setStoredSession(null);
+      renderUnauthed();
+    }
+
+    async function getSession() {
+      const stored = getStoredSession();
+      if (!stored?.access_token) return null;
+      try {
+        const user = await apiCall("/auth/v1/user");
+        return { user, access_token: stored.access_token };
+      } catch {
+        setStoredSession(null);
+        return null;
+      }
+    }
+
+    function setMsg(text, type) {
+      const m = $("msg"); m.textContent = text; m.className = "msg " + (type || "");
+    }
+
+    function switchMode(mode) {
+      authMode = mode;
+      const isLogin = mode === "login";
+      $("authTitle").textContent = isLogin ? "登录" : "注册";
+      $("nickField").classList.toggle("hidden", isLogin);
+      $("submitBtn").textContent = isLogin ? "登录" : "注册";
+      $("tabLogin").classList.toggle("on", isLogin);
+      $("tabSignup").classList.toggle("on", !isLogin);
+      setMsg("");
+    }
+
+    function renderAuthed(user) {
+      $("authWrap").classList.add("hidden");
+      $("loginEntry").classList.add("hidden");
+      $("userBox").classList.remove("hidden");
+      $("mainArea").classList.remove("hidden");
+      const email = user.email || "";
+      const nick = user.user_metadata?.nickname || email.split("@")[0] || "用户";
+      $("nickName").textContent = nick;
+    }
+
+    function renderUnauthed() {
+      $("authWrap").classList.remove("hidden");
+      $("loginEntry").classList.add("hidden");
+      $("userBox").classList.add("hidden");
+      $("mainArea").classList.add("hidden");
+    }
+
+    $("tabLogin").onclick = () => switchMode("login");
+    $("tabSignup").onclick = () => switchMode("signup");
+
+    $("submitBtn").onclick = async () => {
+      const email = $("email").value.trim();
+      const password = $("password").value;
+      const nickname = $("nickname").value.trim();
+      if (!email || !password) { setMsg("请把邮箱和密码都填上", "err"); return; }
+      if (password.length < 6) { setMsg("密码至少 6 位", "err"); return; }
+      if (authMode === "signup" && !nickname) { setMsg("注册请填个昵称", "err"); return; }
+
+      setMsg(authMode === "login" ? "登录中…" : "注册中…");
+      try {
+        if (authMode === "signup") {
+          const data = await signUp(email, password, nickname);
+          if (data.access_token && data.user) {
+            setMsg("注册成功，正在进入…", "ok");
+            renderAuthed(data.user);
+          } else {
+            setMsg("注册成功！请去邮箱确认后，再回来登录", "ok");
+          }
+        } else {
+          const data = await signIn(email, password);
+          setMsg("登录成功", "ok");
+          renderAuthed(data.user);
+        }
+      } catch (e) {
+        setMsg(e.message || "出错了，稍后再试", "err");
+      }
+    };
+
+    $("logoutBtn").onclick = () => signOut();
+
+    (async () => {
+      const session = await getSession();
+      if (session?.user) renderAuthed(session.user);
+      else renderUnauthed();
+    })();
   </script>
-  <script src="https://unpkg.com/@supabase/supabase-js@2" onload="document.getElementById('step3').innerHTML='3️⃣ Supabase SDK: <span class=ok>✅ 加载成功</span>'"></script>
 </body>
 </html>
