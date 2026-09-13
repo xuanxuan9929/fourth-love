@@ -7,81 +7,142 @@
   <style>
     :root {
       --bg: #faf6f4; --card: #ffffff; --ink: #3a2f33; --sub: #9a8b90;
-      --accent: #b76e79; --accent-soft: #f3e4e6; --line: #efe6e8; --danger: #c0392b;
+      --accent: #d4758c; --accent-light: #f3e4e6; --line: #efe6e8;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: var(--bg); color: var(--ink);
+    body {
+      background: var(--bg); color: var(--ink);
       font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
-      -webkit-font-smoothing: antialiased; padding-bottom: 72px;
+      -webkit-font-smoothing: antialiased; padding-bottom: 64px;
     }
     .hidden { display: none !important; }
-    .topbar { position: sticky; top: 0; background: rgba(255,255,255,.92);
+    
+    /* 顶部栏 */
+    .topbar {
+      position: sticky; top: 0; background: rgba(255,255,255,.95);
       backdrop-filter: blur(10px); border-bottom: 1px solid var(--line);
-      padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; z-index: 10;
+      padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; z-index: 10;
     }
-    .topbar .logo { font-weight: 700; font-size: 17px; letter-spacing: .5px; }
-    .topbar .logo span { color: var(--accent); }
-    .topbar .user-box { display: flex; align-items: center; gap: 10px; font-size: 13px; }
-    .topbar .user-box .nick { color: var(--sub); }
-    .topbar .btn { background: var(--accent); color: #fff; border: none;
-      padding: 7px 14px; border-radius: 18px; font-size: 13px; cursor: pointer;
+    .topbar .logo { font-size: 18px; font-weight: 700; color: var(--accent); }
+    .topbar .user-info { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+    .topbar .user-info .nick { max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .topbar .btn-logout { background: transparent; border: 1px solid var(--line); color: var(--sub);
+      padding: 4px 10px; border-radius: 12px; font-size: 12px; cursor: pointer;
     }
-    .topbar .btn.ghost { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
-    .auth-wrap { max-width: 420px; margin: 40px auto 0; padding: 0 20px; }
-    .auth-card { background: var(--card); border-radius: 16px; padding: 28px 22px;
-      box-shadow: 0 4px 16px rgba(0,0,0,.06);
+    
+    /* 底部导航 */
+    .navbar {
+      position: fixed; bottom: 0; left: 0; right: 0; height: 56px;
+      background: #fff; border-top: 1px solid var(--line);
+      display: flex; justify-content: space-around; align-items: center; z-index: 100;
     }
-    .auth-card h2 { font-size: 19px; margin-bottom: 4px; }
+    .navbar .nav-item {
+      flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
+      color: var(--sub); font-size: 11px; cursor: pointer; padding: 6px 0;
+    }
+    .navbar .nav-item.on { color: var(--accent); }
+    .navbar .nav-item .icon { font-size: 22px; }
+    .navbar .nav-fab {
+      width: 48px; height: 48px; border-radius: 50%; background: var(--accent);
+      color: #fff; display: flex; align-items: center; justify-content: center;
+      font-size: 28px; cursor: pointer; margin-top: -20px;
+      box-shadow: 0 4px 12px rgba(212,117,140,.4);
+    }
+    
+    /* 认证页 */
+    .auth-wrap { max-width: 420px; margin: 60px auto 0; padding: 0 20px; }
+    .auth-card { background: var(--card); border-radius: 16px; padding: 28px 22px; box-shadow: 0 4px 16px rgba(0,0,0,.06); }
+    .auth-card h2 { font-size: 20px; margin-bottom: 6px; }
     .auth-card .hint { font-size: 13px; color: var(--sub); margin-bottom: 20px; }
     .switch-tabs { display: flex; gap: 0; margin-bottom: 20px; border-bottom: 1px solid var(--line); }
     .switch-tabs .st { flex: 1; text-align: center; padding: 10px 0; font-size: 14px; color: var(--sub); cursor: pointer; }
     .switch-tabs .st.on { color: var(--accent); font-weight: 600; border-bottom: 2px solid var(--accent); }
     .field { margin-bottom: 14px; }
     .field label { display: block; font-size: 13px; color: var(--sub); margin-bottom: 6px; }
-    .field input { width: 100%; padding: 11px 12px; border: 1px solid var(--line); border-radius: 10px;
-      font-size: 15px; outline: none; background: #fdfbfa;
+    .field input, .field textarea { width: 100%; padding: 11px 12px; border: 1px solid var(--line);
+      border-radius: 10px; font-size: 15px; outline: none; background: #fdfbfa; font-family: inherit;
     }
-    .field input:focus { border-color: var(--accent); }
+    .field input:focus, .field textarea:focus { border-color: var(--accent); }
     .submit { width: 100%; padding: 12px; background: var(--accent); color: #fff;
       border: none; border-radius: 10px; font-size: 15px; cursor: pointer; margin-top: 6px;
     }
     .submit:active { opacity: .85; }
     .msg { font-size: 13px; margin-top: 12px; text-align: center; min-height: 18px; }
-    .msg.err { color: var(--danger); }
+    .msg.err { color: #c0392b; }
     .msg.ok { color: #27ae60; }
-    .tabs { display: flex; gap: 20px; padding: 12px 18px 0; font-size: 14px; }
-    .tabs .tab { color: var(--sub); cursor: pointer; padding-bottom: 8px; }
+    
+    /* 标签页 */
+    .tabs { display: flex; gap: 24px; padding: 14px 18px; background: #fff; border-bottom: 1px solid var(--line); }
+    .tabs .tab { color: var(--sub); cursor: pointer; font-size: 15px; padding-bottom: 4px; }
     .tabs .tab.on { color: var(--accent); font-weight: 600; border-bottom: 2px solid var(--accent); }
-    .feed { padding: 12px 14px; display: flex; flex-direction: column; gap: 12px; }
-    .post { background: var(--card); border-radius: 14px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
-    .post .head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-    .avatar { width: 38px; height: 38px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 15px; font-weight: 700; color: #fff;
+    
+    /* 帖子列表 */
+    .feed { padding: 12px 12px 20px; display: flex; flex-direction: column; gap: 12px; }
+    .post {
+      background: var(--card); border-radius: 14px; padding: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.04);
     }
-    .post .meta { display: flex; flex-direction: column; }
+    .post .head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .avatar {
+      width: 40px; height: 40px; border-radius: 50%; background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .post .meta { flex: 1; min-width: 0; }
     .post .name { font-size: 14px; font-weight: 600; }
     .post .time { font-size: 12px; color: var(--sub); }
-    .post .text { font-size: 15px; line-height: 1.6; margin-bottom: 10px; }
-    .tag { display: inline-block; background: var(--accent-soft); color: var(--accent);
-      font-size: 12px; padding: 2px 10px; border-radius: 10px; margin-right: 6px;
+    .post .content { font-size: 15px; line-height: 1.6; margin-bottom: 10px; white-space: pre-wrap; }
+    .post .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+    .tag {
+      display: inline-block; background: var(--accent-light); color: var(--accent);
+      font-size: 12px; padding: 3px 10px; border-radius: 10px;
     }
-    .post .actions { display: flex; gap: 18px; margin-top: 10px; color: var(--sub); font-size: 13px; }
-    .fab { position: fixed; right: 18px; bottom: 20px; width: 54px; height: 54px;
-      background: var(--accent); color: #fff; border: none; border-radius: 50%;
-      font-size: 26px; cursor: pointer; box-shadow: 0 6px 18px rgba(183,110,121,.4);
+    .post .actions { display: flex; gap: 18px; color: var(--sub); font-size: 13px; }
+    .post .actions span { cursor: pointer; }
+    
+    /* 发布弹窗 */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 200;
+      display: flex; align-items: flex-end; justify-content: center;
     }
+    .modal-content {
+      background: #fff; width: 100%; max-width: 500px; border-radius: 20px 20px 0 0;
+      padding: 20px; max-height: 80vh; overflow-y: auto;
+    }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .modal-header h3 { font-size: 17px; }
+    .modal-header .close { font-size: 24px; color: var(--sub); cursor: pointer; background: none; border: none; }
+    .tag-selector { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    .tag-selector .tag-opt {
+      background: var(--line); color: var(--sub); padding: 6px 14px; border-radius: 16px;
+      font-size: 13px; cursor: pointer; border: 1px solid transparent;
+    }
+    .tag-selector .tag-opt.selected { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
+    
+    /* 个人中心 */
+    .profile { padding: 20px; }
+    .profile-card { background: var(--card); border-radius: 16px; padding: 24px; text-align: center; }
+    .profile-card .avatar { width: 80px; height: 80px; font-size: 32px; margin: 0 auto 12px; }
+    .profile-card .nick { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+    .profile-card .email { font-size: 13px; color: var(--sub); margin-bottom: 16px; }
+    .btn-edit { background: var(--accent); color: #fff; border: none; padding: 10px 24px;
+      border-radius: 20px; font-size: 14px; cursor: pointer;
+    }
+    
+    .empty { text-align: center; padding: 60px 20px; color: var(--sub); font-size: 14px; }
   </style>
 </head>
 <body>
-  <div class="topbar">
-    <div class="logo">第四爱<span>·</span>社区</div>
-    <div class="user-box hidden" id="userBox">
-      <span class="nick" id="nickName"></span>
-      <button class="btn ghost" id="logoutBtn">退出</button>
+  <!-- 顶部栏 -->
+  <div class="topbar hidden" id="topbar">
+    <div class="logo">第四爱</div>
+    <div class="user-info hidden" id="userInfo">
+      <span class="nick" id="topNick"></span>
+      <button class="btn-logout" id="logoutBtn">退出</button>
     </div>
-    <button class="btn hidden" id="loginEntry">登录 / 注册</button>
   </div>
+
+  <!-- 认证页 -->
   <div class="auth-wrap hidden" id="authWrap">
     <div class="auth-card">
       <h2 id="authTitle">登录</h2>
@@ -106,34 +167,91 @@
       <div class="msg" id="msg"></div>
     </div>
   </div>
+
+  <!-- 主内容区 -->
   <div id="mainArea" class="hidden">
-    <div class="tabs">
-      <div class="tab on">推荐</div>
-      <div class="tab">关注</div>
-      <div class="tab">话题</div>
-    </div>
-    <div class="feed">
-      <div class="post">
-        <div class="head">
-          <div class="avatar" style="background:#b76e79;">岚</div>
-          <div class="meta"><div class="name">岚岚</div><div class="time">10 分钟前</div></div>
-        </div>
-        <div class="text">第四爱里最打动我的，从来不是谁压过谁，而是那种被稳稳托住的信任感。</div>
-        <span class="tag"># 关系讨论</span>
-        <div class="actions"><span>♥ 128</span><span>💬 32</span><span>↗ 分享</span></div>
+    <!-- 首页 -->
+    <div id="pageHome">
+      <div class="tabs">
+        <div class="tab on">推荐</div>
+        <div class="tab">关注</div>
+        <div class="tab">话题</div>
       </div>
-      <div class="post">
-        <div class="head">
-          <div class="avatar" style="background:#6e8fb7;">白</div>
-          <div class="meta"><div class="name">白桃乌龙</div><div class="time">1 小时前</div></div>
-        </div>
-        <div class="text">今天第一次鼓起勇气跟对象聊了角色期待，说开了才是开始。</div>
-        <span class="tag"># 日常</span>
-        <div class="actions"><span>♥ 76</span><span>💬 19</span><span>↗ 分享</span></div>
+      <div class="feed" id="feedList">
+        <div class="empty">加载中...</div>
       </div>
     </div>
-    <button class="fab">＋</button>
+
+    <!-- 遇见 -->
+    <div id="pageDiscover" class="hidden">
+      <div class="empty">遇见功能开发中...</div>
+    </div>
+
+    <!-- 微聊 -->
+    <div id="pageChat" class="hidden">
+      <div class="empty">私信功能开发中...</div>
+    </div>
+
+    <!-- 我的 -->
+    <div id="pageProfile" class="hidden">
+      <div class="profile">
+        <div class="profile-card">
+          <div class="avatar" id="profileAvatar"></div>
+          <div class="nick" id="profileNick"></div>
+          <div class="email" id="profileEmail"></div>
+          <button class="btn-edit" onclick="alert('编辑资料功能开发中')">编辑资料</button>
+        </div>
+      </div>
+    </div>
   </div>
+
+  <!-- 底部导航 -->
+  <div class="navbar hidden" id="navbar">
+    <div class="nav-item on" data-page="home">
+      <div class="icon">🏠</div>
+      <div>首页</div>
+    </div>
+    <div class="nav-item" data-page="discover">
+      <div class="icon">✨</div>
+      <div>遇见</div>
+    </div>
+    <div class="nav-fab" id="fabPublish">+</div>
+    <div class="nav-item" data-page="chat">
+      <div class="icon">💬</div>
+      <div>微聊</div>
+    </div>
+    <div class="nav-item" data-page="profile">
+      <div class="icon">👤</div>
+      <div>我的</div>
+    </div>
+  </div>
+
+  <!-- 发布弹窗 -->
+  <div class="modal-overlay hidden" id="publishModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>发布帖子</h3>
+        <button class="close" id="closePublish">×</button>
+      </div>
+      <div class="field">
+        <label>说点什么...</label>
+        <textarea id="postContent" rows="6" placeholder="分享你的故事、想法..."></textarea>
+      </div>
+      <div class="field">
+        <label>选择话题标签（可多选）</label>
+        <div class="tag-selector" id="tagSelector">
+          <div class="tag-opt" data-tag="关系讨论">关系讨论</div>
+          <div class="tag-opt" data-tag="日常">日常</div>
+          <div class="tag-opt" data-tag="求助">求助</div>
+          <div class="tag-opt" data-tag="分享">分享</div>
+          <div class="tag-opt" data-tag="情感">情感</div>
+        </div>
+      </div>
+      <button class="submit" id="submitPost">发布</button>
+      <div class="msg" id="publishMsg"></div>
+    </div>
+  </div>
+
   <script>
     const SUPABASE_URL = "https://eaadmvvpbelpzookqhwv.supabase.co";
     const SUPABASE_KEY = "sb_publishable_yeGWnZ4W0gGZlWT7QXg7sw_Hye-TjqD";
@@ -141,7 +259,10 @@
 
     const $ = id => document.getElementById(id);
     let authMode = "login";
+    let currentUser = null;
+    let selectedTags = [];
 
+    // API 调用
     async function apiCall(endpoint, method = "GET", body = null) {
       const headers = { "apikey": SUPABASE_KEY, "Content-Type": "application/json" };
       const session = getStoredSession();
@@ -163,9 +284,7 @@
     }
 
     async function signUp(email, password, nickname) {
-      const data = await apiCall("/auth/v1/signup", "POST", {
-        email, password, data: { nickname }
-      });
+      const data = await apiCall("/auth/v1/signup", "POST", { email, password, data: { nickname } });
       if (data.access_token) setStoredSession(data);
       return data;
     }
@@ -179,6 +298,7 @@
     async function signOut() {
       try { await apiCall("/auth/v1/logout", "POST"); } catch {}
       setStoredSession(null);
+      currentUser = null;
       renderUnauthed();
     }
 
@@ -194,6 +314,23 @@
       }
     }
 
+    // 获取帖子列表
+    async function fetchPosts() {
+      const data = await apiCall("/rest/v1/posts?order=created_at.desc&limit=20");
+      return data;
+    }
+
+    // 发布帖子
+    async function createPost(content, tags) {
+      const data = await apiCall("/rest/v1/posts", "POST", {
+        user_id: currentUser.id,
+        content,
+        tags
+      });
+      return data;
+    }
+
+    // UI 渲染
     function setMsg(text, type) {
       const m = $("msg"); m.textContent = text; m.className = "msg " + (type || "");
     }
@@ -210,22 +347,67 @@
     }
 
     function renderAuthed(user) {
+      currentUser = user;
       $("authWrap").classList.add("hidden");
-      $("loginEntry").classList.add("hidden");
-      $("userBox").classList.remove("hidden");
+      $("topbar").classList.remove("hidden");
       $("mainArea").classList.remove("hidden");
-      const email = user.email || "";
-      const nick = user.user_metadata?.nickname || email.split("@")[0] || "用户";
-      $("nickName").textContent = nick;
+      $("navbar").classList.remove("hidden");
+      $("userInfo").classList.remove("hidden");
+      const nick = user.user_metadata?.nickname || user.email?.split("@")[0] || "用户";
+      $("topNick").textContent = nick;
+      $("profileNick").textContent = nick;
+      $("profileEmail").textContent = user.email || "";
+      $("profileAvatar").textContent = nick.charAt(0).toUpperCase();
+      loadPosts();
     }
 
     function renderUnauthed() {
       $("authWrap").classList.remove("hidden");
-      $("loginEntry").classList.add("hidden");
-      $("userBox").classList.add("hidden");
+      $("topbar").classList.add("hidden");
       $("mainArea").classList.add("hidden");
+      $("navbar").classList.add("hidden");
     }
 
+    async function loadPosts() {
+      try {
+        const posts = await fetchPosts();
+        const feedList = $("feedList");
+        if (posts.length === 0) {
+          feedList.innerHTML = '<div class="empty">还没有帖子，快来发第一条吧！</div>';
+          return;
+        }
+        feedList.innerHTML = posts.map(post => {
+          const nick = "匿名";
+          const avatar = nick.charAt(0).toUpperCase();
+          const timeStr = new Date(post.created_at).toLocaleString("zh-CN", {
+            month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit"
+          });
+          const tagsHtml = (post.tags || []).map(tag => `<span class="tag"># ${tag}</span>`).join("");
+          return `
+            <div class="post">
+              <div class="head">
+                <div class="avatar">${avatar}</div>
+                <div class="meta">
+                  <div class="name">${nick}</div>
+                  <div class="time">${timeStr}</div>
+                </div>
+              </div>
+              <div class="content">${post.content}</div>
+              <div class="tags">${tagsHtml}</div>
+              <div class="actions">
+                <span>♥ 0</span>
+                <span>💬 0</span>
+                <span>↗ 分享</span>
+              </div>
+            </div>
+          `;
+        }).join("");
+      } catch (e) {
+        $("feedList").innerHTML = `<div class="empty">加载失败：${e.message}</div>`;
+      }
+    }
+
+    // 事件绑定
     $("tabLogin").onclick = () => switchMode("login");
     $("tabSignup").onclick = () => switchMode("signup");
 
@@ -242,7 +424,7 @@
         if (authMode === "signup") {
           const data = await signUp(email, password, nickname);
           if (data.access_token && data.user) {
-            setMsg("注册成功，正在进入…", "ok");
+            setMsg("注册成功", "ok");
             renderAuthed(data.user);
           } else {
             setMsg("注册成功！请去邮箱确认后，再回来登录", "ok");
@@ -253,34 +435,94 @@
           renderAuthed(data.user);
         }
       } catch (e) {
-        setMsg(e.message || "出错了，稍后再试", "err");
+        setMsg(e.message, "err");
       }
     };
 
     $("logoutBtn").onclick = () => signOut();
 
+    // 底部导航切换
+    document.querySelectorAll(".nav-item").forEach(item => {
+      item.onclick = () => {
+        const page = item.dataset.page;
+        document.querySelectorAll(".nav-item").forEach(i => i.classList.remove("on"));
+        item.classList.add("on");
+        ["pageHome", "pageDiscover", "pageChat", "pageProfile"].forEach(id => {
+          $(id).classList.add("hidden");
+        });
+        $("page" + page.charAt(0).toUpperCase() + page.slice(1)).classList.remove("hidden");
+      };
+    });
+
+    // 发布功能
+    $("fabPublish").onclick = () => {
+      $("publishModal").classList.remove("hidden");
+      $("postContent").value = "";
+      selectedTags = [];
+      document.querySelectorAll(".tag-opt").forEach(t => t.classList.remove("selected"));
+      $("publishMsg").textContent = "";
+    };
+
+    $("closePublish").onclick = () => $("publishModal").classList.add("hidden");
+
+    document.querySelectorAll(".tag-opt").forEach(opt => {
+      opt.onclick = () => {
+        const tag = opt.dataset.tag;
+        if (selectedTags.includes(tag)) {
+          selectedTags = selectedTags.filter(t => t !== tag);
+          opt.classList.remove("selected");
+        } else {
+          selectedTags.push(tag);
+          opt.classList.add("selected");
+        }
+      };
+    });
+
+    $("submitPost").onclick = async () => {
+      const content = $("postContent").value.trim();
+      if (!content) {
+        $("publishMsg").textContent = "请输入内容";
+        $("publishMsg").className = "msg err";
+        return;
+      }
+      $("publishMsg").textContent = "发布中...";
+      $("publishMsg").className = "msg";
+      try {
+        await createPost(content, selectedTags);
+        $("publishMsg").textContent = "发布成功！";
+        $("publishMsg").className = "msg ok";
+        setTimeout(() => {
+          $("publishModal").classList.add("hidden");
+          loadPosts();
+        }, 1000);
+      } catch (e) {
+        $("publishMsg").textContent = e.message;
+        $("publishMsg").className = "msg err";
+      }
+    };
+
+    // 邮箱确认回调
     async function handleAuthCallback() {
       const params = new URLSearchParams(location.search);
       const tokenHash = params.get('token_hash');
       const type = params.get('type');
       if (tokenHash && type === 'signup') {
-        setMsg("正在确认邮箱并登录...");
         try {
           const data = await apiCall("/auth/v1/verify", "POST", { token_hash: tokenHash, type });
           if (data.access_token) {
             setStoredSession(data);
             history.replaceState(null, "", location.pathname);
-            setMsg("邮箱确认成功，欢迎！", "ok");
             renderAuthed(data.user);
             return true;
           }
         } catch (e) {
-          setMsg("确认失败：" + e.message, "err");
+          console.error("确认失败", e);
         }
       }
       return false;
     }
 
+    // 初始化
     (async () => {
       if (await handleAuthCallback()) return;
       const session = await getSession();
