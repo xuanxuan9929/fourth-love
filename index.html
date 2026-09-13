@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第四爱社区</title>
+  <style>
+    :root {
+      --bg: #faf6f4;
+      --card: #ffffff;
+      --ink: #3a2f33;
+      --sub: #9a8b90;
+      --accent: #b76e79;
+      --accent-soft: #f3e4e6;
+      --line: #efe6e8;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: 72px;
+    }
+    .topbar {
+      position: sticky; top: 0;
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
+      padding: 14px 18px;
+      display: flex; align-items: center; justify-content: space-between;
+      z-index: 10;
+    }
+    .topbar .logo { font-weight: 700; font-size: 17px; letter-spacing: .5px; }
+    .topbar .logo span { color: var(--accent); }
+    .topbar .publish-top {
+      background: var(--accent); color: #fff; border: none;
+      padding: 7px 14px; border-radius: 18px; font-size: 13px; cursor: pointer;
+    }
+    .tabs {
+      display: flex; gap: 20px; padding: 12px 18px 0; font-size: 14px;
+    }
+    .tabs .tab { color: var(--sub); cursor: pointer; padding-bottom: 8px; }
+    .tabs .tab.on { color: var(--accent); font-weight: 600; border-bottom: 2px solid var(--accent); }
+    .feed { padding: 12px 14px; display: flex; flex-direction: column; gap: 12px; }
+    .post {
+      background: var(--card); border-radius: 14px; padding: 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.04);
+    }
+    .post .head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .avatar {
+      width: 38px; height: 38px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 700; color: #fff;
+    }
+    .post .meta { display: flex; flex-direction: column; }
+    .post .name { font-size: 14px; font-weight: 600; }
+    .post .time { font-size: 12px; color: var(--sub); }
+    .post .text { font-size: 15px; line-height: 1.6; margin-bottom: 10px; }
+    .tag {
+      display: inline-block; background: var(--accent-soft); color: var(--accent);
+      font-size: 12px; padding: 2px 10px; border-radius: 10px; margin-right: 6px;
+    }
+    .post .actions {
+      display: flex; gap: 18px; margin-top: 10px; color: var(--sub); font-size: 13px;
+    }
+    .post .actions span { cursor: pointer; }
+    .post .actions .like { color: var(--accent); }
+    .fab {
+      position: fixed; right: 18px; bottom: 20px; width: 54px; height: 54px;
+      background: var(--accent); color: #fff; border: none; border-radius: 50%;
+      font-size: 26px; cursor: pointer; box-shadow: 0 6px 18px rgba(183,110,121,.4);
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="logo">第四爱<span>·</span>社区</div>
+    <button class="publish-top">发帖</button>
+  </div>
+
+  <div class="tabs">
+    <div class="tab on">推荐</div>
+    <div class="tab">关注</div>
+    <div class="tab">话题</div>
+  </div>
+
+  <div class="feed">
+    <div class="post">
+      <div class="head">
+        <div class="avatar" style="background:#b76e79;">岚</div>
+        <div class="meta">
+          <div class="name">岚岚</div>
+          <div class="time">10 分钟前</div>
+        </div>
+      </div>
+      <div class="text">第四爱里最打动我的，从来不是谁压过谁，而是那种被稳稳托住的信任感。对方愿意把脆弱交给你，你也愿意为这份交托负责。</div>
+      <span class="tag"># 关系讨论</span>
+      <div class="actions">
+        <span class="like">♥ 128</span>
+        <span>💬 32</span>
+        <span>↗ 分享</span>
+      </div>
+    </div>
+
+    <div class="post">
+      <div class="head">
+        <div class="avatar" style="background:#6e8fb7;">白</div>
+        <div class="meta">
+          <div class="name">白桃乌龙</div>
+          <div class="time">1 小时前</div>
+        </div>
+      </div>
+      <div class="text">今天第一次鼓起勇气跟对象聊了角色期待，没有想象中尴尬，反而松了一口气。有些话，说开了才是开始。</div>
+      <span class="tag"># 日常</span>
+      <div class="actions">
+        <span>♥ 76</span>
+        <span>💬 19</span>
+        <span>↗ 分享</span>
+      </div>
+    </div>
+
+    <div class="post">
+      <div class="head">
+        <div class="avatar" style="background:#8a7bb7;">舟</div>
+        <div class="meta">
+          <div class="name">舟舟</div>
+          <div class="time">3 小时前</div>
+        </div>
+      </div>
+      <div class="text">想问问大家，第四爱里你们怎么定义"安全感"？是行动上的照顾，还是情绪上的兜底？</div>
+      <span class="tag"># 求助</span>
+      <div class="actions">
+        <span>♥ 54</span>
+        <span>💬 87</span>
+        <span>↗ 分享</span>
+      </div>
+    </div>
+  </div>
+
+  <button class="fab">＋</button>
+</body>
+</html>
