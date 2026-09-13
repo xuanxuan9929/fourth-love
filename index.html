@@ -259,7 +259,30 @@
 
     $("logoutBtn").onclick = () => signOut();
 
+    async function handleAuthCallback() {
+      const params = new URLSearchParams(location.search);
+      const tokenHash = params.get('token_hash');
+      const type = params.get('type');
+      if (tokenHash && type === 'signup') {
+        setMsg("正在确认邮箱并登录...");
+        try {
+          const data = await apiCall("/auth/v1/verify", "POST", { token_hash: tokenHash, type });
+          if (data.access_token) {
+            setStoredSession(data);
+            history.replaceState(null, "", location.pathname);
+            setMsg("邮箱确认成功，欢迎！", "ok");
+            renderAuthed(data.user);
+            return true;
+          }
+        } catch (e) {
+          setMsg("确认失败：" + e.message, "err");
+        }
+      }
+      return false;
+    }
+
     (async () => {
+      if (await handleAuthCallback()) return;
       const session = await getSession();
       if (session?.user) renderAuthed(session.user);
       else renderUnauthed();
