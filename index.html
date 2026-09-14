@@ -16,21 +16,19 @@
       -webkit-font-smoothing: antialiased; padding-bottom: 64px;
     }
     .hidden { display: none !important; }
-    
-    /* 顶部栏 */
+
     .topbar {
       position: sticky; top: 0; background: rgba(255,255,255,.95);
       backdrop-filter: blur(10px); border-bottom: 1px solid var(--line);
       padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; z-index: 10;
     }
     .topbar .logo { font-size: 18px; font-weight: 700; color: var(--accent); }
-    .topbar .user-info { display: flex; align-items: center; gap: 8px; font-size: 13px; }
-    .topbar .user-info .nick { max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .topbar .user-info { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; }
+    .topbar .user-info .nick { max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .topbar .btn-logout { background: transparent; border: 1px solid var(--line); color: var(--sub);
       padding: 4px 10px; border-radius: 12px; font-size: 12px; cursor: pointer;
     }
-    
-    /* 底部导航 */
+
     .navbar {
       position: fixed; bottom: 0; left: 0; right: 0; height: 56px;
       background: #fff; border-top: 1px solid var(--line);
@@ -48,8 +46,7 @@
       font-size: 28px; cursor: pointer; margin-top: -20px;
       box-shadow: 0 4px 12px rgba(212,117,140,.4);
     }
-    
-    /* 认证页 */
+
     .auth-wrap { max-width: 420px; margin: 60px auto 0; padding: 0 20px; }
     .auth-card { background: var(--card); border-radius: 16px; padding: 28px 22px; box-shadow: 0 4px 16px rgba(0,0,0,.06); }
     .auth-card h2 { font-size: 20px; margin-bottom: 6px; }
@@ -70,44 +67,38 @@
     .msg { font-size: 13px; margin-top: 12px; text-align: center; min-height: 18px; }
     .msg.err { color: #c0392b; }
     .msg.ok { color: #27ae60; }
-    
-    /* 标签页 */
+
     .tabs { display: flex; gap: 24px; padding: 14px 18px; background: #fff; border-bottom: 1px solid var(--line); }
     .tabs .tab { color: var(--sub); cursor: pointer; font-size: 15px; padding-bottom: 4px; }
     .tabs .tab.on { color: var(--accent); font-weight: 600; border-bottom: 2px solid var(--accent); }
-    
-    /* 帖子列表 */
+
     .feed { padding: 12px 12px 20px; display: flex; flex-direction: column; gap: 12px; }
-    .post {
-      background: var(--card); border-radius: 14px; padding: 14px;
-      box-shadow: 0 2px 8px rgba(0,0,0,.04);
-    }
+    .post { background: var(--card); border-radius: 14px; padding: 14px; box-shadow: 0 2px 8px rgba(0,0,0,.04); }
     .post .head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
     .avatar {
       width: 40px; height: 40px; border-radius: 50%; background: var(--accent);
       display: flex; align-items: center; justify-content: center;
-      font-size: 16px; font-weight: 700; color: #fff; flex-shrink: 0;
+      font-size: 16px; font-weight: 700; color: #fff; flex-shrink: 0; overflow: hidden;
     }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
     .post .meta { flex: 1; min-width: 0; }
     .post .name { font-size: 14px; font-weight: 600; }
     .post .time { font-size: 12px; color: var(--sub); }
     .post .content { font-size: 15px; line-height: 1.6; margin-bottom: 10px; white-space: pre-wrap; }
     .post .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
-    .tag {
-      display: inline-block; background: var(--accent-light); color: var(--accent);
+    .tag { display: inline-block; background: var(--accent-light); color: var(--accent);
       font-size: 12px; padding: 3px 10px; border-radius: 10px;
     }
     .post .actions { display: flex; gap: 18px; color: var(--sub); font-size: 13px; }
     .post .actions span { cursor: pointer; }
-    
-    /* 发布弹窗 */
+
     .modal-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 200;
       display: flex; align-items: flex-end; justify-content: center;
     }
     .modal-content {
       background: #fff; width: 100%; max-width: 500px; border-radius: 20px 20px 0 0;
-      padding: 20px; max-height: 80vh; overflow-y: auto;
+      padding: 20px; max-height: 85vh; overflow-y: auto;
     }
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
     .modal-header h3 { font-size: 17px; }
@@ -118,22 +109,28 @@
       font-size: 13px; cursor: pointer; border: 1px solid transparent;
     }
     .tag-selector .tag-opt.selected { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
-    
-    /* 个人中心 */
+
     .profile { padding: 20px; }
     .profile-card { background: var(--card); border-radius: 16px; padding: 24px; text-align: center; }
     .profile-card .avatar { width: 80px; height: 80px; font-size: 32px; margin: 0 auto 12px; }
     .profile-card .nick { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+    .profile-card .bio { font-size: 14px; color: var(--sub); margin-bottom: 6px; }
     .profile-card .email { font-size: 13px; color: var(--sub); margin-bottom: 16px; }
     .btn-edit { background: var(--accent); color: #fff; border: none; padding: 10px 24px;
       border-radius: 20px; font-size: 14px; cursor: pointer;
     }
-    
+
     .empty { text-align: center; padding: 60px 20px; color: var(--sub); font-size: 14px; }
+
+    .avatar-preview {
+      width: 80px; height: 80px; border-radius: 50%; background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px; font-weight: 700; color: #fff; margin: 0 auto 12px; overflow: hidden;
+    }
+    .avatar-preview img { width: 100%; height: 100%; object-fit: cover; }
   </style>
 </head>
 <body>
-  <!-- 顶部栏 -->
   <div class="topbar hidden" id="topbar">
     <div class="logo">第四爱</div>
     <div class="user-info hidden" id="userInfo">
@@ -142,7 +139,6 @@
     </div>
   </div>
 
-  <!-- 认证页 -->
   <div class="auth-wrap hidden" id="authWrap">
     <div class="auth-card">
       <h2 id="authTitle">登录</h2>
@@ -168,9 +164,7 @@
     </div>
   </div>
 
-  <!-- 主内容区 -->
   <div id="mainArea" class="hidden">
-    <!-- 首页 -->
     <div id="pageHome">
       <div class="tabs">
         <div class="tab on">推荐</div>
@@ -182,30 +176,27 @@
       </div>
     </div>
 
-    <!-- 遇见 -->
     <div id="pageDiscover" class="hidden">
       <div class="empty">遇见功能开发中...</div>
     </div>
 
-    <!-- 微聊 -->
     <div id="pageChat" class="hidden">
       <div class="empty">私信功能开发中...</div>
     </div>
 
-    <!-- 我的 -->
     <div id="pageProfile" class="hidden">
       <div class="profile">
         <div class="profile-card">
           <div class="avatar" id="profileAvatar"></div>
           <div class="nick" id="profileNick"></div>
+          <div class="bio" id="profileBio"></div>
           <div class="email" id="profileEmail"></div>
-          <button class="btn-edit" onclick="alert('编辑资料功能开发中')">编辑资料</button>
+          <button class="btn-edit" id="btnEditProfile">编辑资料</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 底部导航 -->
   <div class="navbar hidden" id="navbar">
     <div class="nav-item on" data-page="home">
       <div class="icon">🏠</div>
@@ -226,7 +217,6 @@
     </div>
   </div>
 
-  <!-- 发布弹窗 -->
   <div class="modal-overlay hidden" id="publishModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -252,6 +242,31 @@
     </div>
   </div>
 
+  <div class="modal-overlay hidden" id="editModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>编辑资料</h3>
+        <button class="close" id="closeEdit">×</button>
+      </div>
+      <div class="field">
+        <label>头像</label>
+        <div class="avatar-preview" id="avatarPreview"></div>
+        <input type="file" id="avatarFile" accept="image/*" style="font-size:13px;padding:8px;">
+        <small style="color:#9a8b90;">可选，上传后自动显示（会存到 Supabase 存储）</small>
+      </div>
+      <div class="field">
+        <label>昵称</label>
+        <input type="text" id="editNick" placeholder="你的昵称">
+      </div>
+      <div class="field">
+        <label>简介</label>
+        <textarea id="editBio" rows="3" placeholder="介绍一下自己..."></textarea>
+      </div>
+      <button class="submit" id="submitEdit">保存</button>
+      <div class="msg" id="editMsg"></div>
+    </div>
+  </div>
+
   <script>
     const SUPABASE_URL = "https://eaadmvvpbelpzookqhwv.supabase.co";
     const SUPABASE_KEY = "sb_publishable_yeGWnZ4W0gGZlWT7QXg7sw_Hye-TjqD";
@@ -260,9 +275,9 @@
     const $ = id => document.getElementById(id);
     let authMode = "login";
     let currentUser = null;
+    let currentProfile = null;
     let selectedTags = [];
 
-    // API 调用
     async function apiCall(endpoint, method = "GET", body = null) {
       const headers = { "apikey": SUPABASE_KEY, "Content-Type": "application/json" };
       const session = getStoredSession();
@@ -288,20 +303,17 @@
       if (data.access_token) setStoredSession(data);
       return data;
     }
-
     async function signIn(email, password) {
       const data = await apiCall("/auth/v1/token?grant_type=password", "POST", { email, password });
       if (data.access_token) setStoredSession(data);
       return data;
     }
-
     async function signOut() {
       try { await apiCall("/auth/v1/logout", "POST"); } catch {}
       setStoredSession(null);
-      currentUser = null;
+      currentUser = null; currentProfile = null;
       renderUnauthed();
     }
-
     async function getSession() {
       const stored = getStoredSession();
       if (!stored?.access_token) return null;
@@ -314,23 +326,49 @@
       }
     }
 
-    // 获取帖子列表
-    async function fetchPosts() {
-      const data = await apiCall("/rest/v1/posts?order=created_at.desc&limit=20");
-      return data;
+    // 获取/创建用户资料
+    async function getProfile(userId) {
+      const data = await apiCall(`/rest/v1/profiles?id=eq.${userId}&limit=1`);
+      return data[0] || null;
     }
-
-    // 发布帖子
-    async function createPost(content, tags) {
-      const data = await apiCall("/rest/v1/posts", "POST", {
-        user_id: currentUser.id,
-        content,
-        tags
+    async function ensureProfile(user) {
+      let profile = await getProfile(user.id);
+      if (!profile) {
+        // 首次登录自动创建资料
+        const nickname = user.user_metadata?.nickname || user.email?.split("@")[0] || "用户";
+        await apiCall("/rest/v1/profiles", "POST", {
+          id: user.id, nickname, bio: "", avatar_url: ""
+        });
+        profile = await getProfile(user.id);
+      }
+      return profile;
+    }
+    async function updateProfile(userId, updates) {
+      const data = await apiCall(`/rest/v1/profiles?id=eq.${userId}`, "PATCH", {
+        ...updates, updated_at: new Date().toISOString()
       });
       return data;
     }
 
-    // UI 渲染
+    async function fetchPosts() {
+      const data = await apiCall("/rest/v1/posts?order=created_at.desc&limit=30");
+      return data;
+    }
+    async function createPost(content, tags) {
+      const data = await apiCall("/rest/v1/posts", "POST", {
+        user_id: currentUser.id, content, tags
+      });
+      return data;
+    }
+    async function fetchProfiles(userIds) {
+      if (userIds.length === 0) return {};
+      const ids = userIds.join(",");
+      const data = await apiCall(`/rest/v1/profiles?id=in.(${ids})`);
+      const map = {};
+      data.forEach(p => { map[p.id] = p; });
+      return map;
+    }
+
     function setMsg(text, type) {
       const m = $("msg"); m.textContent = text; m.className = "msg " + (type || "");
     }
@@ -346,53 +384,57 @@
       setMsg("");
     }
 
-    function renderAuthed(user) {
-      currentUser = user;
-      $("authWrap").classList.add("hidden");
-      $("topbar").classList.remove("hidden");
-      $("mainArea").classList.remove("hidden");
-      $("navbar").classList.remove("hidden");
-      $("userInfo").classList.remove("hidden");
-      const nick = user.user_metadata?.nickname || user.email?.split("@")[0] || "用户";
-      $("topNick").textContent = nick;
-      $("profileNick").textContent = nick;
-      $("profileEmail").textContent = user.email || "";
-      $("profileAvatar").textContent = nick.charAt(0).toUpperCase();
-      loadPosts();
+    function renderAvatar(el, profile, fallback) {
+      el.innerHTML = "";
+      if (profile?.avatar_url) {
+        const img = document.createElement("img");
+        img.src = profile.avatar_url;
+        el.appendChild(img);
+      } else {
+        el.textContent = fallback.charAt(0).toUpperCase();
+      }
     }
 
-    function renderUnauthed() {
-      $("authWrap").classList.remove("hidden");
-      $("topbar").classList.add("hidden");
-      $("mainArea").classList.add("hidden");
-      $("navbar").classList.add("hidden");
+    function renderProfile() {
+      if (!currentProfile) return;
+      const nick = currentProfile.nickname || "用户";
+      $("topNick").textContent = nick;
+      $("profileNick").textContent = nick;
+      $("profileBio").textContent = currentProfile.bio || "这个人很懒，还没写简介";
+      $("profileEmail").textContent = currentUser.email || "";
+      renderAvatar($("profileAvatar"), currentProfile, nick);
     }
 
     async function loadPosts() {
       try {
         const posts = await fetchPosts();
+        const userIds = [...new Set(posts.map(p => p.user_id).filter(Boolean))];
+        const profileMap = await fetchProfiles(userIds);
         const feedList = $("feedList");
         if (posts.length === 0) {
           feedList.innerHTML = '<div class="empty">还没有帖子，快来发第一条吧！</div>';
           return;
         }
         feedList.innerHTML = posts.map(post => {
-          const nick = "匿名";
-          const avatar = nick.charAt(0).toUpperCase();
+          const profile = profileMap[post.user_id] || {};
+          const nick = profile.nickname || "匿名";
           const timeStr = new Date(post.created_at).toLocaleString("zh-CN", {
             month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit"
           });
           const tagsHtml = (post.tags || []).map(tag => `<span class="tag"># ${tag}</span>`).join("");
+          const avatarHtml = profile.avatar_url
+            ? `<img src="${profile.avatar_url}">`
+            : nick.charAt(0).toUpperCase();
           return `
             <div class="post">
               <div class="head">
-                <div class="avatar">${avatar}</div>
+                <div class="avatar">${avatarHtml}</div>
                 <div class="meta">
                   <div class="name">${nick}</div>
                   <div class="time">${timeStr}</div>
                 </div>
               </div>
-              <div class="content">${post.content}</div>
+              <div class="content">${escapeHtml(post.content)}</div>
               <div class="tags">${tagsHtml}</div>
               <div class="actions">
                 <span>♥ 0</span>
@@ -403,11 +445,35 @@
           `;
         }).join("");
       } catch (e) {
-        $("feedList").innerHTML = `<div class="empty">加载失败：${e.message}</div>`;
+        $("feedList").innerHTML = `<div class="empty">加载失败：${escapeHtml(e.message)}</div>`;
       }
     }
 
-    // 事件绑定
+    function escapeHtml(str) {
+      return (str || "").replace(/[&<>"']/g, c => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[c]));
+    }
+
+    async function renderAuthed(user) {
+      currentUser = user;
+      $("authWrap").classList.add("hidden");
+      $("topbar").classList.remove("hidden");
+      $("mainArea").classList.remove("hidden");
+      $("navbar").classList.remove("hidden");
+      $("userInfo").classList.remove("hidden");
+      currentProfile = await ensureProfile(user);
+      renderProfile();
+      loadPosts();
+    }
+
+    function renderUnauthed() {
+      $("authWrap").classList.remove("hidden");
+      $("topbar").classList.add("hidden");
+      $("mainArea").classList.add("hidden");
+      $("navbar").classList.add("hidden");
+    }
+
     $("tabLogin").onclick = () => switchMode("login");
     $("tabSignup").onclick = () => switchMode("signup");
 
@@ -418,7 +484,6 @@
       if (!email || !password) { setMsg("请把邮箱和密码都填上", "err"); return; }
       if (password.length < 6) { setMsg("密码至少 6 位", "err"); return; }
       if (authMode === "signup" && !nickname) { setMsg("注册请填个昵称", "err"); return; }
-
       setMsg(authMode === "login" ? "登录中…" : "注册中…");
       try {
         if (authMode === "signup") {
@@ -441,7 +506,6 @@
 
     $("logoutBtn").onclick = () => signOut();
 
-    // 底部导航切换
     document.querySelectorAll(".nav-item").forEach(item => {
       item.onclick = () => {
         const page = item.dataset.page;
@@ -454,7 +518,6 @@
       };
     });
 
-    // 发布功能
     $("fabPublish").onclick = () => {
       $("publishModal").classList.remove("hidden");
       $("postContent").value = "";
@@ -462,7 +525,6 @@
       document.querySelectorAll(".tag-opt").forEach(t => t.classList.remove("selected"));
       $("publishMsg").textContent = "";
     };
-
     $("closePublish").onclick = () => $("publishModal").classList.add("hidden");
 
     document.querySelectorAll(".tag-opt").forEach(opt => {
@@ -494,14 +556,70 @@
         setTimeout(() => {
           $("publishModal").classList.add("hidden");
           loadPosts();
-        }, 1000);
+        }, 800);
       } catch (e) {
         $("publishMsg").textContent = e.message;
         $("publishMsg").className = "msg err";
       }
     };
 
-    // 邮箱确认回调
+    // 编辑资料
+    $("btnEditProfile").onclick = () => {
+      $("editModal").classList.remove("hidden");
+      $("editNick").value = currentProfile?.nickname || "";
+      $("editBio").value = currentProfile?.bio || "";
+      $("editMsg").textContent = "";
+      renderAvatar($("avatarPreview"), currentProfile, currentProfile?.nickname || "用");
+    };
+    $("closeEdit").onclick = () => $("editModal").classList.add("hidden");
+
+    $("avatarFile").onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const img = document.createElement("img");
+        img.src = ev.target.result;
+        $("avatarPreview").innerHTML = "";
+        $("avatarPreview").appendChild(img);
+      };
+      reader.readAsDataURL(file);
+    };
+
+    $("submitEdit").onclick = async () => {
+      const nickname = $("editNick").value.trim();
+      const bio = $("editBio").value.trim();
+      if (!nickname) {
+        $("editMsg").textContent = "昵称不能为空";
+        $("editMsg").className = "msg err";
+        return;
+      }
+      $("editMsg").textContent = "保存中...";
+      $("editMsg").className = "msg";
+      try {
+        let avatar_url = currentProfile?.avatar_url || "";
+        // 头像上传（如果有选文件，转 base64 存字段）
+        const file = $("avatarFile").files[0];
+        if (file) {
+          const base64 = await new Promise((resolve) => {
+            const r = new FileReader();
+            r.onload = () => resolve(r.result);
+            r.readAsDataURL(file);
+          });
+          avatar_url = base64;
+        }
+        await updateProfile(currentUser.id, { nickname, bio, avatar_url });
+        currentProfile = await getProfile(currentUser.id);
+        renderProfile();
+        $("editMsg").textContent = "保存成功！";
+        $("editMsg").className = "msg ok";
+        setTimeout(() => $("editModal").classList.add("hidden"), 800);
+      } catch (e) {
+        $("editMsg").textContent = e.message;
+        $("editMsg").className = "msg err";
+      }
+    };
+
     async function handleAuthCallback() {
       const params = new URLSearchParams(location.search);
       const tokenHash = params.get('token_hash');
@@ -522,7 +640,6 @@
       return false;
     }
 
-    // 初始化
     (async () => {
       if (await handleAuthCallback()) return;
       const session = await getSession();
