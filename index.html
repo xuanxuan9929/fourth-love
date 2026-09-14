@@ -116,6 +116,13 @@
     .profile-card .nick { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
     .profile-card .bio { font-size: 14px; color: var(--sub); margin-bottom: 6px; }
     .profile-card .email { font-size: 13px; color: var(--sub); margin-bottom: 16px; }
+    .user-id {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--accent-light); color: var(--accent);
+      border-radius: 14px; padding: 6px 14px; font-size: 14px; font-weight: 600;
+      margin-bottom: 16px; cursor: pointer; user-select: all;
+    }
+    .user-id:active { opacity: .7; }
     .btn-edit { background: var(--accent); color: #fff; border: none; padding: 10px 24px;
       border-radius: 20px; font-size: 14px; cursor: pointer;
     }
@@ -344,6 +351,7 @@
           <div class="nick" id="profileNick"></div>
           <div class="bio" id="profileBio"></div>
           <div class="email" id="profileEmail"></div>
+          <div class="user-id" id="profileDisplayId" title="点击复制">📋 ID 获取中...</div>
           <button class="btn-edit" id="btnEditProfile">编辑资料</button>
         </div>
         <div class="vip-entry" id="vipEntry">
@@ -691,6 +699,21 @@
       $("profileBio").textContent = currentProfile.bio || "这个人很懒，还没写简介";
       $("profileEmail").textContent = currentUser.email || "";
       renderAvatar($("profileAvatar"), currentProfile, nick);
+      // 展示 ID + 点击复制
+      const did = currentProfile.display_id;
+      const idEl = $("profileDisplayId");
+      if (did) {
+        idEl.textContent = `# ID: ${did} 📋`;
+        idEl.onclick = () => {
+          navigator.clipboard?.writeText(String(did));
+          const old = idEl.textContent;
+          idEl.textContent = `# ID: ${did} ✓ 已复制`;
+          setTimeout(() => { idEl.textContent = `# ID: ${did} 📋`; }, 1200);
+        };
+      } else {
+        idEl.textContent = "# ID: 生成中";
+        idEl.onclick = null;
+      }
       renderVipEntry();
     }
 
@@ -1066,7 +1089,10 @@
       const plan = PLANS[selectedPlan];
       $("payAmount").textContent = `¥${plan.price}`;
       $("payPlanText").textContent = `${plan.priceText}/${plan.label}`;
-      $("payEmail").textContent = `我的账号邮箱：${currentUser?.email || "未知"}`;
+      const did = currentProfile?.display_id;
+      $("payEmail").textContent = did
+        ? `付款后把「ID ${did}」发给管理员开通`
+        : `付款后把邮箱 ${currentUser?.email || ""} 发给管理员开通`;
       $("vipPage").classList.add("hidden");
       $("payModal").classList.remove("hidden");
     };
