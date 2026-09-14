@@ -139,8 +139,9 @@
       background: #333; border-radius: 8px; touch-action: none;
     }
     .crop-viewport img {
-      position: absolute; max-width: none; user-select: none;
+      position: absolute; left: 0; top: 0; max-width: none; user-select: none;
       -webkit-user-drag: none; pointer-events: none;
+      transform-origin: 0 0;
     }
     .crop-grid {
       position: absolute; inset: 0; pointer-events: none;
