@@ -288,6 +288,88 @@
 
     /* 会员小标识 */
     .vip-crown-mini { font-size: 13px; margin-left: 4px; }
+
+    /* 全屏编辑资料页 */
+    .edit-page {
+      position: fixed; inset: 0; z-index: 240; background: var(--bg);
+      overflow-y: auto; padding-bottom: 100px;
+    }
+    .edit-topbar {
+      position: sticky; top: 0; background: rgba(255,255,255,.95); backdrop-filter: blur(10px);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 13px 18px; border-bottom: 1px solid var(--line); z-index: 5;
+    }
+    .edit-topbar .cancel { background:none; border:none; color: var(--sub); font-size:14px; cursor:pointer; }
+    .edit-topbar .title { font-size: 16px; font-weight: 600; }
+    .edit-topbar .save-link { background:none; border:none; color: var(--accent); font-size:14px; font-weight:600; cursor:pointer; }
+    .edit-body { padding: 16px 14px; }
+    .edit-avatar-card { background:#fff; border-radius:16px; padding:24px; text-align:center; margin-bottom:6px; cursor:pointer; }
+    .edit-avatar-card .avatar-wrap { position:relative; width:88px; height:88px; margin:0 auto 10px; }
+    .edit-avatar-card .avatar { width:88px; height:88px; font-size:34px; margin:0; }
+    .edit-avatar-card .cam {
+      position:absolute; right:-2px; bottom:-2px; width:30px; height:30px; border-radius:50%;
+      background: var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-size:15px;
+      border: 2px solid #fff;
+    }
+    .edit-avatar-card .tip { font-size:13px; color: var(--sub); }
+    .edit-card { background:#fff; border-radius:16px; padding: 4px 16px; margin-bottom:14px; }
+    .edit-row { display:flex; align-items:center; gap:12px; padding:13px 0; border-bottom:1px solid #f7f2f4; }
+    .edit-row:last-child { border-bottom:none; }
+    .edit-row .label { width:64px; font-size:14px; flex-shrink:0; }
+    .edit-row .value { flex:1; min-width:0; }
+    .edit-row input, .edit-row select {
+      width:100%; border:none; outline:none; font-size:14px; background:transparent; color:var(--ink);
+      font-family:inherit; padding:0;
+    }
+    .edit-row.select-row { position:relative; padding-right:18px; }
+    .edit-row.select-row::after {
+      content:''; position:absolute; right:2px; top:50%; width:7px; height:7px;
+      border-right:1.5px solid var(--sub); border-bottom:1.5px solid var(--sub);
+      transform:translateY(-70%) rotate(45deg); pointer-events:none;
+    }
+    .bio-wrap { padding:13px 0; }
+    .bio-wrap textarea {
+      width:100%; border:none; outline:none; resize:none; font-size:14px; line-height:1.6;
+      font-family:inherit; background:transparent; color:var(--ink); min-height:64px; display:block;
+    }
+    .bio-count { text-align:right; font-size:12px; color:var(--sub); }
+    .readonly-badge { background:var(--line); color:var(--sub); font-size:12px; border-radius:12px; padding:3px 10px; flex-shrink:0; }
+    .section-title { font-size:14px; font-weight:600; margin:18px 2px 10px; }
+    .interest-grid { display:flex; flex-wrap:wrap; gap:10px; padding:14px 0 4px; }
+    .interest-tag {
+      background:var(--line); color:var(--sub); padding:7px 14px; border-radius:18px; font-size:13px; cursor:pointer; border:1px solid transparent;
+    }
+    .interest-tag.on { background:var(--accent-light); color:var(--accent); border-color:var(--accent); }
+    .interest-add { display:flex; gap:8px; padding: 10px 0 14px; }
+    .interest-add input { flex:1; border:1px solid var(--line); border-radius:18px; padding:7px 14px; font-size:13px; outline:none; background:#fdfbfa; }
+    .interest-add button { border:none; background:var(--accent); color:#fff; border-radius:18px; padding:0 16px; font-size:13px; cursor:pointer; }
+    .photo-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; padding:14px 0; }
+    .photo-cell { position:relative; aspect-ratio:1; border-radius:12px; overflow:hidden; background:var(--line); }
+    .photo-cell img { width:100%; height:100%; object-fit:cover; }
+    .photo-cell .del {
+      position:absolute; top:4px; right:4px; width:20px; height:20px; border-radius:50%;
+      background:rgba(0,0,0,.55); color:#fff; border:none; font-size:12px; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .photo-add {
+      aspect-ratio:1; border:2px dashed #eccbd3; border-radius:12px; background:var(--accent-light);
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+      color:var(--accent); font-size:12px; cursor:pointer;
+    }
+    .photo-add .plus { width:34px; height:34px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; font-size:20px; color:var(--accent); }
+    .photo-tip { font-size:12px; color:var(--sub); padding-bottom:12px; }
+    .edit-footer {
+      position:fixed; bottom:0; left:0; right:0; background:#fff;
+      padding:12px 16px calc(12px + env(safe-area-inset-bottom)); box-shadow:0 -2px 10px rgba(0,0,0,.05); z-index:10;
+    }
+    .edit-footer button {
+      width:100%; padding:14px; border:none; border-radius:26px;
+      background:linear-gradient(90deg,#d4758c,#a06ee0); color:#fff; font-size:16px; font-weight:600; cursor:pointer;
+    }
+    .edit-msg { font-size:13px; text-align:center; min-height:18px; margin-top:8px; }
+    .edit-msg.ok { color:#27ae60; }
+    .edit-msg.err { color:#c0392b; }
+    .hidden-input { display:none !important; }
   </style>
 </head>
 <body>
@@ -411,29 +493,121 @@
     </div>
   </div>
 
-  <div class="modal-overlay hidden" id="editModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>编辑资料</h3>
-        <button class="close" id="closeEdit">×</button>
-      </div>
-      <div class="field">
-        <label>头像</label>
-        <div class="avatar-preview" id="avatarPreview"></div>
-        <input type="file" id="avatarFile" accept="image/*" style="font-size:13px;padding:8px;">
-        <small style="color:#9a8b90;">可选，上传后自动显示（会存到 Supabase 存储）</small>
-      </div>
-      <div class="field">
-        <label>昵称</label>
-        <input type="text" id="editNick" placeholder="你的昵称">
-      </div>
-      <div class="field">
-        <label>简介</label>
-        <textarea id="editBio" rows="3" placeholder="介绍一下自己..."></textarea>
-      </div>
-      <button class="submit" id="submitEdit">保存</button>
-      <div class="msg" id="editMsg"></div>
+  <!-- 全屏编辑资料页 -->
+  <div class="edit-page hidden" id="editPage">
+    <div class="edit-topbar">
+      <button class="cancel" id="closeEdit">取消</button>
+      <div class="title">编辑资料</div>
+      <button class="save-link" id="submitEdit">保存</button>
     </div>
+    <div class="edit-body">
+      <div class="edit-avatar-card" id="avatarClickArea">
+        <div class="avatar-wrap">
+          <div class="avatar avatar-preview" id="avatarPreview"></div>
+          <div class="cam">📷</div>
+        </div>
+        <div class="tip">点击更换头像</div>
+      </div>
+
+      <div class="section-title">基本信息</div>
+      <div class="edit-card">
+        <div class="edit-row">
+          <div class="label">昵称</div>
+          <div class="value"><input type="text" id="editNick" maxlength="20" placeholder="你的昵称"></div>
+        </div>
+        <div class="bio-wrap">
+          <textarea id="editBio" maxlength="200" placeholder="写一句个性签名，让大家认识你..."></textarea>
+          <div class="bio-count"><span id="bioCount">0</span>/200</div>
+        </div>
+        <div class="edit-row">
+          <div class="label">邮箱</div>
+          <div class="value" id="editEmailShow" style="color:var(--sub);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
+          <div class="readonly-badge">🔒 不可修改</div>
+        </div>
+      </div>
+
+      <div class="section-title">更多资料</div>
+      <div class="edit-card">
+        <div class="edit-row select-row">
+          <div class="label">生日</div>
+          <div class="value"><input type="date" id="editBirthday"></div>
+        </div>
+        <div class="edit-row">
+          <div class="label">地址</div>
+          <div class="value"><input type="text" id="editLocation" placeholder="如：天津市·南开区"></div>
+        </div>
+      </div>
+
+      <div class="section-title">详细资料</div>
+      <div class="edit-card">
+        <div class="edit-row select-row">
+          <div class="label">身高</div>
+          <div class="value"><select id="editHeight"></select></div>
+        </div>
+        <div class="edit-row select-row">
+          <div class="label">体重</div>
+          <div class="value"><select id="editWeight"></select></div>
+        </div>
+        <div class="edit-row select-row">
+          <div class="label">学历</div>
+          <div class="value"><select id="editEducation">
+            <option value="">未设置</option>
+            <option>高中及以下</option><option>中专</option><option>大专</option>
+            <option>本科</option><option>硕士</option><option>博士</option>
+          </select></div>
+        </div>
+        <div class="edit-row">
+          <div class="label">职业</div>
+          <div class="value"><input type="text" id="editJob" placeholder="如：设计师"></div>
+        </div>
+        <div class="edit-row select-row">
+          <div class="label">年收入</div>
+          <div class="value"><select id="editIncome">
+            <option value="">未设置</option>
+            <option>5万以下</option><option>5-12万</option><option>12-25万</option>
+            <option>25-50万</option><option>50万以上</option>
+          </select></div>
+        </div>
+        <div class="edit-row select-row">
+          <div class="label">情感状态</div>
+          <div class="value"><select id="editRelationship">
+            <option value="">未设置</option>
+            <option>单身</option><option>恋爱中</option><option>已婚</option><option>保密</option>
+          </select></div>
+        </div>
+        <div class="edit-row select-row">
+          <div class="label">星座</div>
+          <div class="value"><select id="editConstellation">
+            <option value="">未设置</option>
+            <option>白羊座</option><option>金牛座</option><option>双子座</option><option>巨蟹座</option>
+            <option>狮子座</option><option>处女座</option><option>天秤座</option><option>天蝎座</option>
+            <option>射手座</option><option>摩羯座</option><option>水瓶座</option><option>双鱼座</option>
+          </select></div>
+        </div>
+      </div>
+
+      <div class="section-title">兴趣爱好 <span style="font-weight:400;color:var(--sub);font-size:12px;">已选 <span id="interestCount">0</span> 项</span></div>
+      <div class="edit-card">
+        <div class="interest-grid" id="interestGrid"></div>
+        <div class="interest-add">
+          <input type="text" id="customInterest" maxlength="6" placeholder="自定义标签（最多6字）">
+          <button id="addInterestBtn">＋ 添加</button>
+        </div>
+      </div>
+
+      <div class="section-title">照片墙 <span style="font-weight:400;color:var(--sub);font-size:12px;">最多6张</span></div>
+      <div class="edit-card">
+        <div class="photo-grid" id="photoGrid"></div>
+        <div class="photo-tip">建议上传真实生活照，展示你的个性魅力</div>
+      </div>
+
+      <div class="msg edit-msg" id="editMsg"></div>
+    </div>
+    <div class="edit-footer">
+      <button id="submitEditBottom">保存修改</button>
+    </div>
+    <input type="file" id="avatarFile" accept="image/*" class="hidden-input">
+    <input type="file" id="photoFile" accept="image/*" multiple class="hidden-input">
   </div>
 
   <!-- 头像裁剪弹窗 -->
@@ -876,17 +1050,112 @@
       }
     };
 
-    // 编辑资料
-    $("btnEditProfile").onclick = () => {
-      $("editModal").classList.remove("hidden");
-      $("editNick").value = currentProfile?.nickname || "";
-      $("editBio").value = currentProfile?.bio || "";
+    // ===== 编辑资料（全屏页）=====
+    const INTEREST_PRESETS = ["阅读","音乐","手作","舞蹈","花艺","旅行","美食","电影","摄影","游戏","运动","宠物","美妆","穿搭","二次元","桌游","咖啡","音乐节","追剧","写作"];
+    let editInterests = [];
+    let editPhotos = [];
+
+    function constellationFrom(dateStr) {
+      if (!dateStr) return "";
+      const parts = dateStr.split("-").map(Number);
+      if (parts.length < 3 || parts[1] < 1 || parts[1] > 12) return "";
+      const m = parts[1], d = parts[2];
+      const days = [20,19,21,20,21,22,23,23,23,24,23,22];
+      const names = ["摩羯座","水瓶座","双鱼座","白羊座","金牛座","双子座","巨蟹座","狮子座","处女座","天秤座","天蝎座","射手座","摩羯座"];
+      return (d < days[m-1]) ? names[m-1] : names[m];
+    }
+
+    function renderInterestGrid() {
+      const all = [...INTEREST_PRESETS, ...editInterests.filter(t => !INTEREST_PRESETS.includes(t))];
+      $("interestGrid").innerHTML = all.map(tag =>
+        `<span class="interest-tag ${editInterests.includes(tag) ? "on" : ""}" data-tag="${tag}">${tag}</span>`
+      ).join("");
+      $("interestCount").textContent = editInterests.length;
+      $("interestGrid").querySelectorAll(".interest-tag").forEach(el => {
+        el.onclick = () => {
+          const tag = el.dataset.tag;
+          if (editInterests.includes(tag)) editInterests = editInterests.filter(t => t !== tag);
+          else if (editInterests.length < 10) editInterests.push(tag);
+          renderInterestGrid();
+        };
+      });
+    }
+
+    function renderPhotoGrid() {
+      let html = editPhotos.map((src, i) =>
+        `<div class="photo-cell"><img src="${src}"><button class="del" data-i="${i}">×</button></div>`
+      ).join("");
+      if (editPhotos.length < 6) {
+        html += `<div class="photo-add" id="photoAddBtn"><div class="plus">＋</div><div>添加照片</div></div>`;
+      }
+      $("photoGrid").innerHTML = html;
+      $("photoGrid").querySelectorAll(".del").forEach(btn => {
+        btn.onclick = () => { editPhotos.splice(parseInt(btn.dataset.i), 1); renderPhotoGrid(); };
+      });
+      const addBtn = $("photoAddBtn");
+      if (addBtn) addBtn.onclick = () => $("photoFile").click();
+    }
+
+    function fillNumSelect(id, from, to, cur, unit) {
+      const sel = $(id);
+      let opts = `<option value="">未设置</option>`;
+      for (let v = from; v <= to; v++) {
+        opts += `<option value="${v}" ${cur == v ? "selected" : ""}>${v}${unit}</option>`;
+      }
+      sel.innerHTML = opts;
+    }
+
+    function openEditPage() {
+      const p = currentProfile || {};
+      $("editNick").value = p.nickname || "";
+      $("editBio").value = p.bio || "";
+      $("bioCount").textContent = (p.bio || "").length;
+      $("editEmailShow").textContent = currentUser?.email || "";
+      $("editBirthday").value = p.birthday || "";
+      $("editLocation").value = p.location || "";
+      fillNumSelect("editHeight", 140, 220, p.height, "cm");
+      fillNumSelect("editWeight", 35, 120, p.weight, "kg");
+      $("editEducation").value = p.education || "";
+      $("editJob").value = p.job || "";
+      $("editIncome").value = p.income || "";
+      $("editRelationship").value = p.relationship || "";
+      $("editConstellation").value = p.constellation || "";
+      editInterests = [...(p.interests || [])];
+      editPhotos = [...(p.photos || [])];
       $("editMsg").textContent = "";
       $("avatarFile").value = "";
+      $("photoFile").value = "";
       avatarBase64 = null;
-      renderAvatar($("avatarPreview"), currentProfile, currentProfile?.nickname || "用");
+      renderAvatar($("avatarPreview"), p, p.nickname || "用");
+      renderInterestGrid();
+      renderPhotoGrid();
+      $("editPage").classList.remove("hidden");
+    }
+
+    $("btnEditProfile").onclick = openEditPage;
+    $("closeEdit").onclick = () => $("editPage").classList.add("hidden");
+    $("avatarClickArea").onclick = () => $("avatarFile").click();
+    $("editBio").addEventListener("input", () => {
+      $("bioCount").textContent = $("editBio").value.length;
+    });
+    $("addInterestBtn").onclick = () => {
+      const val = $("customInterest").value.trim();
+      if (!val) return;
+      if (editInterests.includes(val)) {
+        $("editMsg").textContent = "已经选过这个标签啦";
+        $("editMsg").className = "msg edit-msg err";
+        return;
+      }
+      if (editInterests.length >= 10) {
+        $("editMsg").textContent = "最多选 10 个标签";
+        $("editMsg").className = "msg edit-msg err";
+        return;
+      }
+      editInterests.push(val);
+      $("customInterest").value = "";
+      renderInterestGrid();
+      $("editMsg").textContent = "";
     };
-    $("closeEdit").onclick = () => $("editModal").classList.add("hidden");
 
     let avatarBase64 = null;
     let cropState = null;
@@ -999,30 +1268,75 @@
       closeCropModal();
     };
 
-    $("submitEdit").onclick = async () => {
+    async function saveProfile() {
       const nickname = $("editNick").value.trim();
-      const bio = $("editBio").value.trim();
       if (!nickname) {
         $("editMsg").textContent = "昵称不能为空";
-        $("editMsg").className = "msg err";
+        $("editMsg").className = "msg edit-msg err";
         return;
       }
       $("editMsg").textContent = "保存中...";
-      $("editMsg").className = "msg";
+      $("editMsg").className = "msg edit-msg";
       try {
         let avatar_url = currentProfile?.avatar_url || "";
-        if (avatarBase64) {
-          avatar_url = avatarBase64;
-        }
-        await updateProfile(currentUser.id, { nickname, bio, avatar_url });
+        if (avatarBase64) avatar_url = avatarBase64;
+        const birthday = $("editBirthday").value;
+        let constellation = $("editConstellation").value;
+        if (birthday && !constellation) constellation = constellationFrom(birthday);
+        const updates = {
+          nickname,
+          bio: $("editBio").value.trim(),
+          avatar_url,
+          birthday,
+          location: $("editLocation").value.trim(),
+          height: $("editHeight").value ? parseInt($("editHeight").value) : null,
+          weight: $("editWeight").value ? parseInt($("editWeight").value) : null,
+          education: $("editEducation").value,
+          job: $("editJob").value.trim(),
+          income: $("editIncome").value,
+          relationship: $("editRelationship").value,
+          constellation,
+          interests: editInterests,
+          photos: editPhotos
+        };
+        await updateProfile(currentUser.id, updates);
         currentProfile = await getProfile(currentUser.id);
         renderProfile();
         $("editMsg").textContent = "保存成功！";
-        $("editMsg").className = "msg ok";
-        setTimeout(() => $("editModal").classList.add("hidden"), 800);
+        $("editMsg").className = "msg edit-msg ok";
+        setTimeout(() => $("editPage").classList.add("hidden"), 600);
       } catch (e) {
         $("editMsg").textContent = e.message;
-        $("editMsg").className = "msg err";
+        $("editMsg").className = "msg edit-msg err";
+      }
+    }
+    $("submitEdit").onclick = saveProfile;
+    $("submitEditBottom").onclick = saveProfile;
+
+    $("photoFile").onchange = async (e) => {
+      const files = [...e.target.files];
+      $("photoFile").value = "";
+      const room = 6 - editPhotos.length;
+      if (room <= 0) {
+        $("editMsg").textContent = "照片墙最多 6 张";
+        $("editMsg").className = "msg edit-msg err";
+        return;
+      }
+      const list = files.slice(0, room);
+      if (list.length === 0) return;
+      $("editMsg").textContent = "处理照片中...";
+      $("editMsg").className = "msg edit-msg";
+      try {
+        for (const f of list) {
+          const b64 = await compressAvatar(f, 220);
+          editPhotos.push(b64);
+        }
+        renderPhotoGrid();
+        $("editMsg").textContent = "照片已添加，记得点保存";
+        $("editMsg").className = "msg edit-msg ok";
+      } catch (err) {
+        $("editMsg").textContent = "照片处理失败：" + err.message;
+        $("editMsg").className = "msg edit-msg err";
       }
     };
 
