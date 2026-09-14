@@ -157,6 +157,130 @@
     .crop-btns button { flex: 1; padding: 12px; border: none; border-radius: 10px; font-size: 15px; cursor: pointer; }
     .crop-btns .btn-cancel { background: #444; color: #fff; }
     .crop-btns .btn-ok { background: #d4758c; color: #fff; }
+
+    /* 会员入口横幅 */
+    .vip-entry {
+      margin-top: 16px; border-radius: 16px; padding: 16px;
+      background: linear-gradient(135deg, #8e8e9a, #b8b0c4);
+      color: #fff; display: flex; align-items: center; gap: 14px; cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,.08);
+    }
+    .vip-entry .vip-crown {
+      width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(255,255,255,.5);
+      display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
+    }
+    .vip-entry .vip-text { flex: 1; }
+    .vip-entry .vip-title { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .vip-entry .vip-title .badge {
+      font-size: 10px; border: 1px solid rgba(255,255,255,.7); border-radius: 8px; padding: 1px 6px; font-weight: 400;
+    }
+    .vip-entry .vip-desc { font-size: 12px; opacity: .85; margin-top: 3px; }
+    .vip-entry .vip-go { font-size: 13px; opacity: .9; text-align: center; }
+    .vip-entry.active { background: linear-gradient(135deg, #d4758c, #a06ee0); }
+
+    /* 会员全屏页 */
+    .vip-page {
+      position: fixed; inset: 0; z-index: 250; overflow-y: auto;
+      background: #f5f0f4; padding-bottom: 90px;
+    }
+    .vip-hero {
+      background: linear-gradient(135deg, #c94f8c, #8a5fd6);
+      border-radius: 0 0 28px 28px; padding: 20px 20px 28px; color: #fff; position: relative;
+    }
+    .vip-hero .vip-close {
+      position: absolute; left: 16px; top: 16px; background: none; border: none;
+      color: #fff; font-size: 26px; cursor: pointer; line-height: 1;
+    }
+    .vip-hero h1 { font-size: 22px; margin: 30px 0 10px 8px; display: flex; align-items: center; gap: 8px; }
+    .vip-hero .vip-status {
+      display: inline-block; margin-left: 8px; background: rgba(255,255,255,.25);
+      border-radius: 14px; padding: 5px 14px; font-size: 13px;
+    }
+    .vip-section { padding: 18px 16px 0; }
+    .vip-section h3 { font-size: 16px; margin-bottom: 12px; }
+    .plans { display: flex; gap: 12px; }
+    .plan {
+      flex: 1; background: #fff; border-radius: 16px; padding: 18px 14px;
+      border: 2px solid transparent; position: relative; cursor: pointer;
+    }
+    .plan.selected { border-color: #d4758c; background: #fdf0f3; }
+    .plan .plan-name { font-size: 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+    .plan .plan-check {
+      width: 18px; height: 18px; border-radius: 50%; background: #eee; color: transparent;
+      display: flex; align-items: center; justify-content: center; font-size: 12px;
+    }
+    .plan.selected .plan-check { background: #d4758c; color: #fff; }
+    .plan .plan-price { font-size: 30px; font-weight: 700; }
+    .plan .plan-price small { font-size: 13px; font-weight: 400; color: var(--sub); }
+    .plan .plan-tag {
+      position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+      background: #d4758c; color: #fff; font-size: 11px; border-radius: 12px; padding: 2px 12px;
+    }
+    .vip-info-card, .vip-rights-card {
+      background: #fff; border-radius: 16px; padding: 16px; margin-top: 14px;
+    }
+    .vip-info-card .info-title, .vip-rights-card .rights-title {
+      font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 6px;
+      padding-bottom: 10px; border-bottom: 1px solid var(--line); margin-bottom: 4px;
+    }
+    .vip-info-card p { font-size: 13px; color: var(--sub); line-height: 1.7; margin: 10px 0 0 0; }
+    .right-item {
+      display: flex; align-items: center; gap: 12px; padding: 11px 0;
+      border-bottom: 1px solid #f7f2f4; font-size: 14px;
+    }
+    .right-item:last-child { border-bottom: none; }
+    .right-item .r-check {
+      width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+      background: linear-gradient(135deg, #d4758c, #b06ee0);
+      color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px;
+    }
+    .vip-footer {
+      position: fixed; bottom: 0; left: 0; right: 0; background: #fff;
+      padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+      box-shadow: 0 -2px 10px rgba(0,0,0,.05); z-index: 10;
+    }
+    .vip-agreement { text-align: center; font-size: 12px; color: var(--sub); margin-bottom: 8px; }
+    .vip-agreement a { color: #d4758c; }
+    .vip-buy-btn {
+      width: 100%; padding: 14px; border: none; border-radius: 26px;
+      background: linear-gradient(90deg, #d4758c, #a06ee0);
+      color: #fff; font-size: 16px; font-weight: 600; cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center; padding: 14px 22px;
+    }
+    .vip-buy-btn .price-tag {
+      background: rgba(255,255,255,.25); border-radius: 14px; padding: 4px 12px; font-size: 13px;
+    }
+
+    /* 付款提示弹窗 */
+    .pay-modal {
+      position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 260;
+      display: flex; align-items: center; justify-content: center; padding: 24px;
+    }
+    .pay-card {
+      background: #fff; border-radius: 18px; padding: 22px; width: 100%; max-width: 360px;
+      text-align: center; max-height: 85vh; overflow-y: auto;
+    }
+    .pay-card h3 { font-size: 18px; margin-bottom: 6px; }
+    .pay-card .pay-amount { font-size: 28px; font-weight: 700; color: #d4758c; margin: 8px 0 14px; }
+    .pay-qr {
+      width: 200px; height: 200px; margin: 0 auto 12px; border-radius: 12px;
+      background: #f7f2f4; border: 1px dashed #d8c9cf;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--sub); font-size: 13px; padding: 12px; line-height: 1.6;
+    }
+    .pay-qr img { width: 100%; height: 100%; object-fit: contain; }
+    .pay-card .pay-tip { font-size: 13px; color: var(--sub); line-height: 1.7; text-align: left; }
+    .pay-card .pay-email {
+      background: #fdf0f3; border-radius: 10px; padding: 10px; margin-top: 10px;
+      font-size: 13px; color: #d4758c; word-break: break-all;
+    }
+    .pay-card .btn-close-pay {
+      margin-top: 14px; width: 100%; padding: 12px; border: none; border-radius: 12px;
+      background: var(--accent); color: #fff; font-size: 15px; cursor: pointer;
+    }
+
+    /* 会员小标识 */
+    .vip-crown-mini { font-size: 13px; margin-left: 4px; }
   </style>
 </head>
 <body>
@@ -221,6 +345,14 @@
           <div class="bio" id="profileBio"></div>
           <div class="email" id="profileEmail"></div>
           <button class="btn-edit" id="btnEditProfile">编辑资料</button>
+        </div>
+        <div class="vip-entry" id="vipEntry">
+          <div class="vip-crown">👑</div>
+          <div class="vip-text">
+            <div class="vip-title">开通会员 <span class="badge">限时</span></div>
+            <div class="vip-desc" id="vipEntryDesc">解锁全部会员特权，探索更多可能</div>
+          </div>
+          <div class="vip-go" id="vipEntryGo">去开通 ›</div>
         </div>
       </div>
     </div>
@@ -311,6 +443,75 @@
         <button class="btn-cancel" id="cropCancel">取消</button>
         <button class="btn-ok" id="cropConfirm">确定裁剪</button>
       </div>
+    </div>
+  </div>
+
+  <!-- 会员全屏页 -->
+  <div class="vip-page hidden" id="vipPage">
+    <div class="vip-hero">
+      <button class="vip-close" id="vipClose">×</button>
+      <h1>👑 订阅会员</h1>
+      <span class="vip-status" id="vipStatus">尚未开通会员</span>
+    </div>
+
+    <div class="vip-section">
+      <h3>选择套餐</h3>
+      <div class="plans">
+        <div class="plan" data-plan="year">
+          <div class="plan-tag">最划算</div>
+          <div class="plan-name">年卡 <span class="plan-check">✓</span></div>
+          <div class="plan-price">¥90<small> /年</small></div>
+        </div>
+        <div class="plan" data-plan="month">
+          <div class="plan-name">月卡 <span class="plan-check">✓</span></div>
+          <div class="plan-price">¥19.99<small> /月</small></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="vip-section">
+      <div class="vip-info-card">
+        <div class="info-title">ℹ️ 关于会员</div>
+        <p>💬 为了圈子的纯净，避免广告猎奇账号进入影响大家氛围体验。</p>
+        <p>💬 因此需要开通会员才能进入这个圈子，费用不多，就当请站长点杯奶茶啦~~~</p>
+      </div>
+      <div class="vip-rights-card">
+        <div class="rights-title">✨ 解锁会员后，你可以：</div>
+        <div class="right-item"><span class="r-check">✓</span>和喜欢的人持续聊天</div>
+        <div class="right-item"><span class="r-check">✓</span>消息过滤</div>
+        <div class="right-item"><span class="r-check">✓</span>参与评论与互动</div>
+        <div class="right-item"><span class="r-check">✓</span>发布视频动态</div>
+        <div class="right-item"><span class="r-check">✓</span>发布自己的动态被更多人看到</div>
+        <div class="right-item"><span class="r-check">✓</span>解锁消息阅读状态</div>
+        <div class="right-item"><span class="r-check">✓</span>解锁谁看过我</div>
+        <div class="right-item"><span class="r-check">✓</span>获得专属身份标识</div>
+        <div class="right-item"><span class="r-check">✓</span>匹配更多同频的人</div>
+        <div class="right-item"><span class="r-check">✓</span>暖语精灵陪伴</div>
+      </div>
+    </div>
+
+    <div class="vip-footer">
+      <div class="vip-agreement">购买即视为同意<a href="javascript:void(0)">《会员服务协议》</a></div>
+      <button class="vip-buy-btn" id="vipBuyBtn">
+        <span id="vipBuyLabel">¥90 去开通会员</span>
+        <span class="price-tag" id="vipBuyPrice">¥90/年</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 付款提示弹窗 -->
+  <div class="pay-modal hidden" id="payModal">
+    <div class="pay-card">
+      <h3>开通会员</h3>
+      <div class="pay-amount" id="payAmount">¥90</div>
+      <div class="pay-qr">收款码即将放置<br>（把你的微信/支付宝收款码发给小克，自动贴到这里）</div>
+      <div class="pay-tip">
+        ① 扫码付款后，把这条复制发给管理员：<br>
+        <b>「我付款了 <span id="payPlanText">90元/年卡</span>，邮箱：」</b><br>
+        ② 管理员核实后为你开通，一般几分钟内生效
+      </div>
+      <div class="pay-email" id="payEmail"></div>
+      <button class="btn-close-pay" id="payClose">我知道了</button>
     </div>
   </div>
 
@@ -490,6 +691,7 @@
       $("profileBio").textContent = currentProfile.bio || "这个人很懒，还没写简介";
       $("profileEmail").textContent = currentUser.email || "";
       renderAvatar($("profileAvatar"), currentProfile, nick);
+      renderVipEntry();
     }
 
     async function loadPosts() {
@@ -505,6 +707,7 @@
         feedList.innerHTML = posts.map(post => {
           const profile = profileMap[post.user_id] || {};
           const nick = profile.nickname || "匿名";
+          const vip = isVip(profile) ? '<span class="vip-crown-mini">👑</span>' : "";
           const timeStr = new Date(post.created_at).toLocaleString("zh-CN", {
             month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit"
           });
@@ -517,7 +720,7 @@
               <div class="head">
                 <div class="avatar">${avatarHtml}</div>
                 <div class="meta">
-                  <div class="name">${nick}</div>
+                  <div class="name">${escapeHtml(nick)}${vip}</div>
                   <div class="time">${timeStr}</div>
                 </div>
               </div>
@@ -799,6 +1002,75 @@
         $("editMsg").className = "msg err";
       }
     };
+
+    // ===== 会员功能 =====
+    const PLANS = {
+      year: { label: "年卡", price: 90, priceText: "90元", unit: "¥90/年" },
+      month: { label: "月卡", price: 19.99, priceText: "19.99元", unit: "¥19.99/月" }
+    };
+    let selectedPlan = "year";
+
+    function isVip(profile) {
+      if (!profile?.vip_until) return false;
+      return new Date(profile.vip_until) > new Date();
+    }
+
+    function formatDate(d) {
+      const t = new Date(d);
+      return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,"0")}-${String(t.getDate()).padStart(2,"0")}`;
+    }
+
+    function renderVipEntry() {
+      const vip = isVip(currentProfile);
+      const entry = $("vipEntry");
+      entry.classList.toggle("active", vip);
+      if (vip) {
+        $("vipEntryDesc").textContent = `会员有效期至 ${formatDate(currentProfile.vip_until)}`;
+        $("vipEntryGo").textContent = "查看 ›";
+      } else {
+        $("vipEntryDesc").textContent = "解锁全部会员特权，探索更多可能";
+        $("vipEntryGo").textContent = "去开通 ›";
+      }
+      // 个人中心昵称旁加皇冠
+      const nickEl = $("profileNick");
+      const baseNick = currentProfile?.nickname || "用户";
+      nickEl.textContent = vip ? `${baseNick} 👑` : baseNick;
+    }
+
+    function renderVipPage() {
+      const vip = isVip(currentProfile);
+      $("vipStatus").textContent = vip
+        ? `恭喜已经是会员 · ${formatDate(currentProfile.vip_until)} 到期`
+        : "尚未开通会员";
+      document.querySelectorAll(".plan").forEach(p => {
+        p.classList.toggle("selected", p.dataset.plan === selectedPlan);
+      });
+      const plan = PLANS[selectedPlan];
+      $("vipBuyLabel").textContent = vip
+        ? `¥${plan.price} 续费${plan.label}`
+        : `¥${plan.price} 去开通会员`;
+      $("vipBuyPrice").textContent = plan.unit;
+    }
+
+    $("vipEntry").onclick = () => {
+      renderVipPage();
+      $("vipPage").classList.remove("hidden");
+    };
+    $("vipClose").onclick = () => $("vipPage").classList.add("hidden");
+
+    document.querySelectorAll(".plan").forEach(p => {
+      p.onclick = () => { selectedPlan = p.dataset.plan; renderVipPage(); };
+    });
+
+    $("vipBuyBtn").onclick = () => {
+      const plan = PLANS[selectedPlan];
+      $("payAmount").textContent = `¥${plan.price}`;
+      $("payPlanText").textContent = `${plan.priceText}/${plan.label}`;
+      $("payEmail").textContent = `我的账号邮箱：${currentUser?.email || "未知"}`;
+      $("vipPage").classList.add("hidden");
+      $("payModal").classList.remove("hidden");
+    };
+    $("payClose").onclick = () => $("payModal").classList.add("hidden");
 
     async function handleAuthCallback() {
       const params = new URLSearchParams(location.search);
