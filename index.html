@@ -1168,6 +1168,29 @@
       renderPickerCol("day", birthdayData.day);
     }
 
+    function scrollToIndex(scroller, index) {
+      const items = scroller.querySelectorAll(".picker-item");
+      if (!items.length || !items[index]) return;
+      const rect = scroller.getBoundingClientRect();
+      const centerY = rect.top + rect.height / 2;
+      const itemRect = items[index].getBoundingClientRect();
+      const itemCenter = itemRect.top + itemRect.height / 2;
+      scroller.scrollTop += (itemCenter - centerY);
+    }
+
+    function getCenteredIndex(scroller) {
+      const rect = scroller.getBoundingClientRect();
+      const centerY = rect.top + rect.height / 2;
+      const items = scroller.querySelectorAll(".picker-item");
+      let best = 0, bd = Infinity;
+      items.forEach((it, i) => {
+        const r = it.getBoundingClientRect();
+        const d = Math.abs(r.top + r.height / 2 - centerY);
+        if (d < bd) { bd = d; best = i; }
+      });
+      return best;
+    }
+
     function renderPickerCol(colName, data) {
       const scroller = $(`${colName}Scroller`);
       scroller.onscroll = null;
@@ -1176,17 +1199,14 @@
         `<div class="picker-pad"></div>`;
       // 等布局完成后再定位初始项
       requestAnimationFrame(() => {
-        scroller.scrollTop = data.selected * 42;
+        scrollToIndex(scroller, data.selected);
       });
       let t;
       scroller.onscroll = () => {
         clearTimeout(t);
         t = setTimeout(() => {
-          const idx = Math.max(0, Math.min(data.values.length - 1, Math.round(scroller.scrollTop / 42)));
-          const target = idx * 42;
-          if (Math.abs(scroller.scrollTop - target) > 1) {
-            scroller.scrollTop = target;
-          }
+          const idx = getCenteredIndex(scroller);
+          scrollToIndex(scroller, idx);
           if (idx !== data.selected) {
             data.selected = idx;
             if (colName !== "day") updateDayCol();
@@ -1222,9 +1242,9 @@
     $("birthdayRow").onclick = openBirthdayPicker;
     $("birthdayCancel").onclick = () => $("birthdayPicker").classList.add("hidden");
     $("birthdayConfirm").onclick = () => {
-      const yIdx = Math.round($("yearScroller").scrollTop / 42);
-      const mIdx = Math.round($("monthScroller").scrollTop / 42);
-      const dIdx = Math.round($("dayScroller").scrollTop / 42);
+      const yIdx = getCenteredIndex($("yearScroller"));
+      const mIdx = getCenteredIndex($("monthScroller"));
+      const dIdx = getCenteredIndex($("dayScroller"));
       const y = 1960 + yIdx;
       const m = mIdx + 1;
       const d = dIdx + 1;
