@@ -371,6 +371,13 @@
     .edit-msg.err { color:#c0392b; }
     .hidden-input { display:none !important; }
 
+    .pick-row { display:flex; align-items:center; gap:12px; padding:13px 0; border-bottom:1px solid #f7f2f4; cursor:pointer; }
+    .pick-row:last-child { border-bottom:none; }
+    .pick-row .label { width:64px; font-size:14px; flex-shrink:0; }
+    .pick-row .value { flex:1; text-align:right; color:var(--sub); font-size:14px; }
+    .pick-row .value.set { color:var(--ink); }
+    .pick-row .arrow { color:var(--sub); font-size:12px; }
+
     /* 滚轮选择器弹窗 */
     .picker-overlay { position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:300; display:flex; align-items:flex-end; justify-content:center; }
     .picker-panel { background:#fff; width:100%; max-width:500px; border-radius:16px 16px 0 0; }
@@ -592,9 +599,10 @@
           <div class="label">生日</div>
           <div class="value" id="birthdayDisplay" style="text-align:right;color:var(--ink);">未设置</div>
         </div>
-        <div class="edit-row">
+        <div class="pick-row" id="locationRow">
           <div class="label">地址</div>
-          <div class="value"><input type="text" id="editLocation" placeholder="如：天津市·南开区"></div>
+          <div class="value" id="locationDisplay">未设置</div>
+          <div class="arrow">›</div>
         </div>
       </div>
 
@@ -670,25 +678,16 @@
     <input type="file" id="photoFile" accept="image/*" multiple class="hidden-input">
   </div>
 
-  <!-- 生日滚轮选择器 -->
-  <div class="picker-overlay hidden" id="birthdayPicker">
+  <!-- 通用滚轮选择器弹窗 -->
+  <div class="picker-overlay hidden" id="pickerOverlay">
     <div class="picker-panel">
       <div class="picker-header">
-        <button class="cancel" id="birthdayCancel">取消</button>
-        <div class="title">选择生日</div>
-        <button class="confirm" id="birthdayConfirm">确定</button>
+        <button class="cancel" id="pickerCancelBtn">取消</button>
+        <div class="title" id="pickerTitle">选择</div>
+        <button class="confirm" id="pickerConfirmBtn">确定</button>
       </div>
-      <div class="picker-body">
+      <div class="picker-body" id="pickerBody">
         <div class="picker-highlight"></div>
-        <div class="picker-col" id="yearCol">
-          <div class="picker-scroller" id="yearScroller"></div>
-        </div>
-        <div class="picker-col" id="monthCol">
-          <div class="picker-scroller" id="monthScroller"></div>
-        </div>
-        <div class="picker-col" id="dayCol">
-          <div class="picker-scroller" id="dayScroller"></div>
-        </div>
       </div>
     </div>
   </div>
@@ -1139,34 +1138,11 @@
     let editInterests = [];
     let editPhotos = [];
     let editBirthday = "";
+    let editLocationVal = "";
 
-    // 生日选择器
-    const birthdayData = {
-      year: { values: [], selected: 30 },
-      month: { values: [], selected: 0 },
-      day: { values: [], selected: 0 }
-    };
-
-    function initBirthdayData() {
-      birthdayData.year.values = Array.from({length: 51}, (_, i) => (1960 + i) + "年");
-      birthdayData.month.values = Array.from({length: 12}, (_, i) => (i + 1) + "月");
-      birthdayData.day.values = Array.from({length: 31}, (_, i) => (i + 1) + "日");
-    }
-
-    function getDaysInMonth(year, month) {
-      const daysInMonth = [31,28,31,30,31,30,31,31,30,31,30,31];
-      if (month === 2 && (year % 4 === 0 && year % 100 !== 0 || year % 400 === 0)) return 29;
-      return daysInMonth[month - 1];
-    }
-
-    function updateDayCol() {
-      const y = parseInt(birthdayData.year.values[birthdayData.year.selected]);
-      const m = parseInt(birthdayData.month.values[birthdayData.month.selected]);
-      const maxDay = getDaysInMonth(y, m);
-      birthdayData.day.values = Array.from({length: maxDay}, (_, i) => (i + 1) + "日");
-      if (birthdayData.day.selected >= maxDay) birthdayData.day.selected = maxDay - 1;
-      renderPickerCol("day", birthdayData.day);
-    }
+    // ===== 通用滚轮选择器 =====
+    let pickerCols = [];
+    let pickerOnOk = null;
 
     function scrollToIndex(scroller, index) {
       const items = scroller.querySelectorAll(".picker-item");
@@ -1191,69 +1167,184 @@
       return best;
     }
 
-    function renderPickerCol(colName, data) {
-      const scroller = $(`${colName}Scroller`);
-      scroller.onscroll = null;
-      scroller.innerHTML = `<div class="picker-pad"></div>` +
-        data.values.map(v => `<div class="picker-item">${v}</div>`).join("") +
-        `<div class="picker-pad"></div>`;
-      // 等布局完成后再定位初始项
-      requestAnimationFrame(() => {
-        scrollToIndex(scroller, data.selected);
-      });
+    function buildPickerCol(col) {
+      const div = document.createElement("div");
+      div.className = "picker-col";
+      const scroller = document.createElement("div");
+      scroller.className = "picker-scroller";
+      scroller.innerHTML = '<div class="picker-pad"></div>' +
+        col.values.map(v => '<div class="picker-item">' + v + '</div>').join("") +
+        '<div class="picker-pad"></div>';
+      div.appendChild(scroller);
+      col.scroller = scroller;
+
+      requestAnimationFrame(() => scrollToIndex(scroller, col.selected || 0));
+
       let t;
       scroller.onscroll = () => {
         clearTimeout(t);
         t = setTimeout(() => {
           const idx = getCenteredIndex(scroller);
           scrollToIndex(scroller, idx);
-          if (idx !== data.selected) {
-            data.selected = idx;
-            if (colName !== "day") updateDayCol();
+          if (idx !== col.selected) {
+            col.selected = idx;
+            if (col.onChange) col.onChange(idx);
           }
-        }, 90);
+        }, 80);
       };
+      return div;
     }
+
+    function openPicker(title, cols, onOk) {
+      pickerCols = cols;
+      pickerOnOk = onOk;
+      $("pickerTitle").textContent = title;
+      const body = $("pickerBody");
+      body.innerHTML = '<div class="picker-highlight"></div>';
+      cols.forEach(col => body.appendChild(buildPickerCol(col)));
+      $("pickerOverlay").classList.remove("hidden");
+    }
+
+    $("pickerCancelBtn").onclick = () => $("pickerOverlay").classList.add("hidden");
+    $("pickerConfirmBtn").onclick = () => {
+      const vals = pickerCols.map(c => c.values[getCenteredIndex(c.scroller)]);
+      $("pickerOverlay").classList.add("hidden");
+      if (pickerOnOk) pickerOnOk(vals);
+    };
 
     function formatBirthday(dateStr) {
       if (!dateStr) return "未设置";
-      const [y, m, d] = dateStr.split("-").map(Number);
-      return `${y}年${m}月${d}日`;
+      const p = dateStr.split("-").map(Number);
+      return p[0] + "年" + p[1] + "月" + p[2] + "日";
     }
 
-    function openBirthdayPicker() {
-      // 解析当前生日设置初始值
+    function getDaysInMonth(year, month) {
+      const daysInMonth = [31,28,31,30,31,30,31,31,30,31,30,31];
+      if (month === 2 && (year % 4 === 0 && year % 100 !== 0 || year % 400 === 0)) return 29;
+      return daysInMonth[month - 1];
+    }
+
+    // ===== 生日选择 =====
+    $("birthdayRow").onclick = () => {
+      let y = 1990, m = 1, d = 1;
       if (editBirthday) {
-        const [y, m, d] = editBirthday.split("-").map(Number);
-        birthdayData.year.selected = y - 1960;
-        birthdayData.month.selected = m - 1;
-        birthdayData.day.selected = d - 1;
-      } else {
-        birthdayData.year.selected = 30; // 默认 1990
-        birthdayData.month.selected = 0;
-        birthdayData.day.selected = 0;
+        const p = editBirthday.split("-").map(Number);
+        y = p[0]; m = p[1]; d = p[2];
       }
-      updateDayCol();
-      renderPickerCol("year", birthdayData.year);
-      renderPickerCol("month", birthdayData.month);
-      $("birthdayPicker").classList.remove("hidden");
-    }
-
-    $("birthdayRow").onclick = openBirthdayPicker;
-    $("birthdayCancel").onclick = () => $("birthdayPicker").classList.add("hidden");
-    $("birthdayConfirm").onclick = () => {
-      const yIdx = getCenteredIndex($("yearScroller"));
-      const mIdx = getCenteredIndex($("monthScroller"));
-      const dIdx = getCenteredIndex($("dayScroller"));
-      const y = 1960 + yIdx;
-      const m = mIdx + 1;
-      const d = dIdx + 1;
-      editBirthday = `${y}-${String(m).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
-      $("birthdayDisplay").textContent = formatBirthday(editBirthday);
-      $("birthdayPicker").classList.add("hidden");
+      const years = Array.from({length: 51}, (_, i) => (1960 + i) + "年");
+      const months = Array.from({length: 12}, (_, i) => (i + 1) + "月");
+      const cols = [
+        { values: years, selected: y - 1960 },
+        { values: months, selected: m - 1 }
+      ];
+      cols.push({
+        values: Array.from({length: getDaysInMonth(y, m)}, (_, i) => (i + 1) + "日"),
+        selected: d - 1
+      });
+      const rebuildDay = () => {
+        const yy = 1960 + cols[0].selected;
+        const mm = cols[1].selected + 1;
+        const max = getDaysInMonth(yy, mm);
+        const oldSel = getCenteredIndex(cols[2].scroller);
+        cols[2].values = Array.from({length: max}, (_, j) => (j + 1) + "日");
+        cols[2].selected = Math.min(oldSel, max - 1);
+        const newCol = buildPickerCol(cols[2]);
+        const body = $("pickerBody");
+        const old = body.querySelectorAll(".picker-col")[2];
+        body.replaceChild(newCol, old);
+        cols[2] = newCol;
+      };
+      cols[0].onChange = i => { cols[0].selected = i; rebuildDay(); };
+      cols[1].onChange = i => { cols[1].selected = i; rebuildDay(); };
+      openPicker("选择生日", cols, vals => {
+        const yy = parseInt(vals[0]), mm = parseInt(vals[1]), dd = parseInt(vals[2]);
+        editBirthday = yy + "-" + String(mm).padStart(2,"0") + "-" + String(dd).padStart(2,"0");
+        $("birthdayDisplay").textContent = formatBirthday(editBirthday);
+      });
     };
 
-    initBirthdayData();
+    // ===== 地址数据 =====
+    const AREA = [
+      { n: "北京市", c: [] }, { n: "天津市", c: [] }, { n: "上海市", c: [] }, { n: "重庆市", c: [] },
+      { n: "河北省", c: ["石家庄市","唐山市","秦皇岛市","邯郸市","邢台市","保定市","张家口市","承德市","沧州市","廊坊市","衡水市"] },
+      { n: "山西省", c: ["太原市","大同市","阳泉市","长治市","晋城市","朔州市","晋中市","运城市","忻州市","临汾市","吕梁市"] },
+      { n: "辽宁省", c: ["沈阳市","大连市","鞍山市","抚顺市","本溪市","丹东市","锦州市","营口市","阜新市","辽阳市","盘锦市","铁岭市","朝阳市","葫芦岛市"] },
+      { n: "吉林省", c: ["长春市","吉林市","四平市","辽源市","通化市","白山市","松原市","白城市","延边州"] },
+      { n: "黑龙江省", c: ["哈尔滨市","齐齐哈尔市","鸡西市","鹤岗市","双鸭山市","大庆市","伊春市","佳木斯市","七台河市","牡丹江市","黑河市","绥化市"] },
+      { n: "江苏省", c: ["南京市","无锡市","徐州市","常州市","苏州市","南通市","连云港市","淮安市","盐城市","扬州市","镇江市","泰州市","宿迁市"] },
+      { n: "浙江省", c: ["杭州市","宁波市","温州市","嘉兴市","湖州市","绍兴市","金华市","衢州市","舟山市","台州市","丽水市"] },
+      { n: "安徽省", c: ["合肥市","芜湖市","蚌埠市","淮南市","马鞍山市","淮北市","铜陵市","安庆市","黄山市","滁州市","阜阳市","宿州市","六安市","亳州市","池州市","宣城市"] },
+      { n: "福建省", c: ["福州市","厦门市","莆田市","三明市","泉州市","漳州市","南平市","龙岩市","宁德市"] },
+      { n: "江西省", c: ["南昌市","景德镇市","萍乡市","九江市","新余市","鹰潭市","赣州市","吉安市","宜春市","抚州市","上饶市"] },
+      { n: "山东省", c: ["济南市","青岛市","淄博市","枣庄市","东营市","烟台市","潍坊市","济宁市","泰安市","威海市","日照市","临沂市","德州市","聊城市","滨州市","菏泽市"] },
+      { n: "河南省", c: ["郑州市","开封市","洛阳市","平顶山市","安阳市","鹤壁市","新乡市","焦作市","濮阳市","许昌市","漯河市","三门峡市","南阳市","商丘市","信阳市","周口市","驻马店市"] },
+      { n: "湖北省", c: ["武汉市","黄石市","十堰市","宜昌市","襄阳市","鄂州市","荆门市","孝感市","荆州市","黄冈市","咸宁市","随州市","恩施州"] },
+      { n: "湖南省", c: ["长沙市","株洲市","湘潭市","衡阳市","邵阳市","岳阳市","常德市","张家界市","益阳市","郴州市","永州市","怀化市","娄底市","湘西州"] },
+      { n: "广东省", c: ["广州市","韶关市","深圳市","珠海市","汕头市","佛山市","江门市","湛江市","茂名市","肇庆市","惠州市","梅州市","汕尾市","河源市","阳江市","清远市","东莞市","中山市","潮州市","揭阳市","云浮市"] },
+      { n: "广西区", c: ["南宁市","柳州市","桂林市","梧州市","北海市","防城港市","钦州市","贵港市","玉林市","百色市","贺州市","河池市","来宾市","崇左市"] },
+      { n: "海南省", c: ["海口市","三亚市","三沙市","儋州市"] },
+      { n: "四川省", c: ["成都市","自贡市","攀枝花市","泸州市","德阳市","绵阳市","广元市","遂宁市","内江市","乐山市","南充市","眉山市","宜宾市","广安市","达州市","雅安市","巴中市","资阳市"] },
+      { n: "贵州省", c: ["贵阳市","六盘水市","遵义市","安顺市","毕节市","铜仁市","黔西南州","黔东南州","黔南州"] },
+      { n: "云南省", c: ["昆明市","曲靖市","玉溪市","保山市","昭通市","丽江市","普洱市","临沧市","楚雄州","红河州","文山州","西双版纳州","大理州","德宏州","怒江州","迪庆州"] },
+      { n: "陕西省", c: ["西安市","铜川市","宝鸡市","咸阳市","渭南市","延安市","汉中市","榆林市","安康市","商洛市"] },
+      { n: "甘肃省", c: ["兰州市","嘉峪关市","金昌市","白银市","天水市","武威市","张掖市","平凉市","酒泉市","庆阳市","定西市","陇南市","临夏州","甘南州"] },
+      { n: "青海省", c: ["西宁市","海东市","海北州","黄南州","海南州","果洛州","玉树州","海西州"] },
+      { n: "内蒙古区", c: ["呼和浩特市","包头市","乌海市","赤峰市","通辽市","鄂尔多斯市","呼伦贝尔市","巴彦淖尔市","乌兰察布市","兴安盟","锡林郭勒盟","阿拉善盟"] },
+      { n: "西藏区", c: ["拉萨市","日喀则市","昌都市","林芝市","山南市","那曲市","阿里地区"] },
+      { n: "宁夏区", c: ["银川市","石嘴山市","吴忠市","固原市","中卫市"] },
+      { n: "新疆区", c: ["乌鲁木齐市","克拉玛依市","吐鲁番市","哈密市","昌吉州","博尔塔拉州","巴音郭楞州","阿克苏地区","克孜勒苏州","喀什地区","和田地区","伊犁州","塔城地区","阿勒泰地区"] },
+      { n: "香港", c: [] }, { n: "澳门", c: [] },
+      { n: "台湾省", c: ["台北市","新北市","桃园市","台中市","台南市","高雄市"] }
+    ];
+
+    // ===== 地址选择 =====
+    $("locationRow").onclick = () => {
+      let pIdx = 0, cIdx = 0;
+      const cur = editLocationVal;
+      if (cur) {
+        AREA.forEach((prov, pi) => {
+          if (cur.startsWith(prov.n)) {
+            pIdx = pi;
+            const rest = cur.slice(prov.n.length);
+            const cityName = rest.replace(/^·/, "").split("·")[0];
+            const ci = prov.c.indexOf(cityName);
+            if (ci >= 0) cIdx = ci;
+          }
+        });
+      }
+      const prov = AREA[pIdx];
+      const hasCity = prov.c.length > 0;
+      const cols = [
+        { values: AREA.map(x => x.n), selected: pIdx },
+        { values: hasCity ? prov.c : ["—"], selected: hasCity ? cIdx : 0 }
+      ];
+      cols[0].onChange = i => {
+        pIdx = i;
+        const np = AREA[i];
+        const hasC = np.c.length > 0;
+        cols[1].values = hasC ? np.c : ["—"];
+        cols[1].selected = 0;
+        cIdx = 0;
+        const newCol = buildPickerCol(cols[1]);
+        const body = $("pickerBody");
+        const old = body.querySelectorAll(".picker-col")[1];
+        body.replaceChild(newCol, old);
+      };
+      openPicker("选择地区", cols, vals => {
+        const provName = vals[0];
+        const p2 = AREA.find(x => x.n === provName);
+        if (p2.c.length === 0) {
+          editLocationVal = provName;
+        } else {
+          editLocationVal = provName + "·" + vals[1];
+        }
+        const el = $("locationDisplay");
+        el.textContent = editLocationVal;
+        el.classList.add("set");
+      });
+    };
+
+
 
     function constellationFrom(dateStr) {
       if (!dateStr) return "";
@@ -1313,7 +1404,10 @@
       $("editEmailShow").textContent = currentUser?.email || "";
       editBirthday = p.birthday || "";
       $("birthdayDisplay").textContent = formatBirthday(editBirthday);
-      $("editLocation").value = p.location || "";
+      editLocationVal = p.location || "";
+      const locEl = $("locationDisplay");
+      locEl.textContent = editLocationVal || "未设置";
+      locEl.classList.toggle("set", !!editLocationVal);
       fillNumSelect("editHeight", 140, 220, p.height, "cm");
       fillNumSelect("editWeight", 35, 120, p.weight, "kg");
       $("editEducation").value = p.education || "";
@@ -1488,7 +1582,7 @@
           bio: $("editBio").value.trim(),
           avatar_url,
           birthday: editBirthday,
-          location: $("editLocation").value.trim(),
+          location: editLocationVal,
           height: $("editHeight").value ? parseInt($("editHeight").value) : null,
           weight: $("editWeight").value ? parseInt($("editWeight").value) : null,
           education: $("editEducation").value,
