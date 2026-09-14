@@ -380,9 +380,17 @@
     .picker-header .cancel { color:var(--sub); }
     .picker-header .confirm { color:var(--accent); font-weight:600; }
     .picker-body { display:flex; height:210px; position:relative; }
-    .picker-col { flex:1; overflow:hidden; position:relative; }
-    .picker-scroller { transition:transform 0.3s ease; }
-    .picker-item { height:42px; line-height:42px; text-align:center; font-size:15px; color:var(--sub); }
+    .picker-col { flex:1; overflow:hidden; position:relative; height:210px; }
+    .picker-scroller {
+      height:210px; overflow-y:auto; scroll-snap-type:y mandatory;
+      -webkit-overflow-scrolling:touch; scrollbar-width:none;
+    }
+    .picker-scroller::-webkit-scrollbar { display:none; }
+    .picker-pad { height:84px; }
+    .picker-item {
+      height:42px; line-height:42px; text-align:center; font-size:15px; color:var(--sub);
+      scroll-snap-align:center;
+    }
     .picker-highlight {
       position:absolute; top:84px; left:0; right:0; height:42px; pointer-events:none;
       border-top:1px solid var(--line); border-bottom:1px solid var(--line); background:rgba(0,0,0,.02);
@@ -1163,11 +1171,28 @@
 
     function renderPickerCol(colName, data) {
       const scroller = $(`${colName}Scroller`);
-      scroller.innerHTML = data.values.map(v => `<div class="picker-item">${v}</div>`).join("");
-      scroller.style.transform = `translateY(${84 - data.selected * 42}px)`;
-      scroller.querySelectorAll(".picker-item").forEach((item, i) => {
-        item.onclick = () => { data.selected = i; renderPickerCol(colName, data); if (colName !== "day") updateDayCol(); };
-      });
+      scroller.onscroll = null;
+      scroller.innerHTML = `<div class="picker-pad"></div>` +
+        data.values.map(v => `<div class="picker-item">${v}</div>`).join("") +
+        `<div class="picker-pad"></div>`;
+      scroller.scrollTop = data.selected * 42;
+      let t;
+      scroller.onscroll = () => {
+        clearTimeout(t);
+        t = setTimeout(() => {
+          const idx = Math.max(0, Math.min(data.values.length - 1, Math.round(scroller.scrollTop / 42)));
+          if (idx !== data.selected) {
+            data.selected = idx;
+            if (colName !== "day") updateDayCol();
+          }
+        }, 60);
+      };
+    }
+
+    function formatBirthday(dateStr) {
+      if (!dateStr) return "未设置";
+      const [y, m, d] = dateStr.split("-").map(Number);
+      return `${y}年${m}月${d}日`;
     }
 
     function openBirthdayPicker() {
@@ -1191,11 +1216,14 @@
     $("birthdayRow").onclick = openBirthdayPicker;
     $("birthdayCancel").onclick = () => $("birthdayPicker").classList.add("hidden");
     $("birthdayConfirm").onclick = () => {
-      const y = parseInt(birthdayData.year.values[birthdayData.year.selected]);
-      const m = parseInt(birthdayData.month.values[birthdayData.month.selected]);
-      const d = parseInt(birthdayData.day.values[birthdayData.day.selected]);
+      const yIdx = Math.round($("yearScroller").scrollTop / 42);
+      const mIdx = Math.round($("monthScroller").scrollTop / 42);
+      const dIdx = Math.round($("dayScroller").scrollTop / 42);
+      const y = 1960 + yIdx;
+      const m = mIdx + 1;
+      const d = dIdx + 1;
       editBirthday = `${y}-${String(m).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
-      $("birthdayDisplay").textContent = `${y}年${String(m).padStart(2,"0")}月${String(d).padStart(2,"0")}日`;
+      $("birthdayDisplay").textContent = formatBirthday(editBirthday);
       $("birthdayPicker").classList.add("hidden");
     };
 
@@ -1258,9 +1286,7 @@
       $("bioCount").textContent = (p.bio || "").length;
       $("editEmailShow").textContent = currentUser?.email || "";
       editBirthday = p.birthday || "";
-      $("birthdayDisplay").textContent = editBirthday
-        ? editBirthday.replace(/-/g, "年").replace(/年(\d+)$/, "年$1月").replace(/月(\d+)$/, "月$1日")
-        : "未设置";
+      $("birthdayDisplay").textContent = formatBirthday(editBirthday);
       $("editLocation").value = p.location || "";
       fillNumSelect("editHeight", 140, 220, p.height, "cm");
       fillNumSelect("editWeight", 35, 120, p.weight, "kg");
