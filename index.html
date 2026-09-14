@@ -128,6 +128,34 @@
       font-size: 32px; font-weight: 700; color: #fff; margin: 0 auto 12px; overflow: hidden;
     }
     .avatar-preview img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* 裁剪界面 */
+    .crop-modal {
+      position: fixed; inset: 0; background: #1a1a1a; z-index: 300;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .crop-viewport {
+      position: relative; width: 280px; height: 280px; overflow: hidden;
+      background: #333; border-radius: 8px; touch-action: none;
+    }
+    .crop-viewport img {
+      position: absolute; max-width: none; user-select: none;
+      -webkit-user-drag: none; pointer-events: none;
+    }
+    .crop-grid {
+      position: absolute; inset: 0; pointer-events: none;
+      background: linear-gradient(rgba(255,255,255,.15) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(255,255,255,.15) 1px, transparent 1px);
+      background-size: 70px 70px;
+      box-shadow: inset 0 0 0 9999px rgba(0,0,0,.35);
+    }
+    .crop-controls { width: 280px; margin-top: 20px; color: #fff; }
+    .crop-controls .zoom-row { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+    .crop-controls input[type="range"] { flex: 1; accent-color: #d4758c; }
+    .crop-btns { display: flex; gap: 12px; margin-top: 16px; }
+    .crop-btns button { flex: 1; padding: 12px; border: none; border-radius: 10px; font-size: 15px; cursor: pointer; }
+    .crop-btns .btn-cancel { background: #444; color: #fff; }
+    .crop-btns .btn-ok { background: #d4758c; color: #fff; }
   </style>
 </head>
 <body>
@@ -264,6 +292,24 @@
       </div>
       <button class="submit" id="submitEdit">保存</button>
       <div class="msg" id="editMsg"></div>
+    </div>
+  </div>
+
+  <!-- 头像裁剪弹窗 -->
+  <div class="crop-modal hidden" id="cropModal">
+    <div class="crop-viewport" id="cropViewport">
+      <img id="cropImg" alt="">
+      <div class="crop-grid"></div>
+    </div>
+    <div class="crop-controls">
+      <div class="zoom-row">
+        <span>缩放</span>
+        <input type="range" id="cropZoom" min="1" max="300" value="100">
+      </div>
+      <div class="crop-btns">
+        <button class="btn-cancel" id="cropCancel">取消</button>
+        <button class="btn-ok" id="cropConfirm">确定裁剪</button>
+      </div>
     </div>
   </div>
 
@@ -616,23 +662,114 @@
     $("closeEdit").onclick = () => $("editModal").classList.add("hidden");
 
     let avatarBase64 = null;
+    let cropState = null;
+
     $("avatarFile").onchange = async (e) => {
       const file = e.target.files[0];
       if (!file) return;
-      try {
-        $("editMsg").textContent = "压缩图片中...";
-        $("editMsg").className = "msg";
-        avatarBase64 = await compressAvatar(file);
-        const img = document.createElement("img");
-        img.src = avatarBase64;
-        $("avatarPreview").innerHTML = "";
-        $("avatarPreview").appendChild(img);
-        $("editMsg").textContent = "图片已准备好";
-        $("editMsg").className = "msg ok";
-      } catch (err) {
-        $("editMsg").textContent = "图片处理失败：" + err.message;
-        $("editMsg").className = "msg err";
-      }
+      // 读取原图，打开裁剪界面
+      const reader = new FileReader();
+      reader.onload = (ev) => openCropModal(ev.target.result);
+      reader.readAsDataURL(file);
+    };
+
+    function openCropModal(dataUrl) {
+      const img = $("cropImg");
+      img.onload = () => {
+        const vw = 280; // viewport 边长
+        const ow = img.naturalWidth;
+        const oh = img.naturalHeight;
+        // 初始：cover 填满 viewport
+        const baseScale = Math.max(vw / ow, vw / oh);
+        cropState = {
+          ow, oh, vw,
+          scale: baseScale,
+          tx: (vw - ow * baseScale) / 2,
+          ty: (vw - oh * baseScale) / 2,
+          dragging: false, startX: 0, startY: 0, origTx: 0, origTy: 0
+        };
+        $("cropZoom").value = 100;
+        applyCropTransform();
+        $("cropModal").classList.remove("hidden");
+      };
+      img.src = dataUrl;
+    }
+
+    function applyCropTransform() {
+      const img = $("cropImg");
+      img.style.transform = `translate(${cropState.tx}px, ${cropState.ty}px) scale(${cropState.scale})`;
+    }
+
+    function closeCropModal() {
+      $("cropModal").classList.add("hidden");
+    }
+
+    // 拖动
+    $("cropViewport").addEventListener("pointerdown", (e) => {
+      if (!cropState) return;
+      cropState.dragging = true;
+      cropState.startX = e.clientX;
+      cropState.startY = e.clientY;
+      cropState.origTx = cropState.tx;
+      cropState.origTy = cropState.ty;
+      $("cropViewport").setPointerCapture(e.pointerId);
+    });
+    $("cropViewport").addEventListener("pointermove", (e) => {
+      if (!cropState || !cropState.dragging) return;
+      cropState.tx = cropState.origTx + (e.clientX - cropState.startX);
+      cropState.ty = cropState.origTy + (e.clientY - cropState.startY);
+      applyCropTransform();
+    });
+    $("cropViewport").addEventListener("pointerup", () => {
+      if (cropState) cropState.dragging = false;
+    });
+
+    // 缩放滑条
+    $("cropZoom").addEventListener("input", (e) => {
+      if (!cropState) return;
+      const ratio = parseInt(e.target.value) / 100;
+      const vw = cropState.vw;
+      const ow = cropState.ow, oh = cropState.oh;
+      const baseScale = Math.max(vw / ow, vw / oh);
+      const newScale = baseScale * ratio;
+      // 以 viewport 中心为锚点缩放
+      const cx = vw / 2, cy = vw / 2;
+      cropState.tx = cx - (cx - cropState.tx) * (newScale / cropState.scale);
+      cropState.ty = cy - (cy - cropState.ty) * (newScale / cropState.scale);
+      cropState.scale = newScale;
+      applyCropTransform();
+    });
+
+    $("cropCancel").onclick = () => {
+      closeCropModal();
+      $("avatarFile").value = "";
+    };
+
+    $("cropConfirm").onclick = () => {
+      if (!cropState) return;
+      // 计算裁剪框（viewport）对应的原始图片区域
+      const { ow, oh, vw, scale, tx, ty } = cropState;
+      const origX = (0 - tx) / scale;   // viewport 左上角对应原始图坐标
+      const origY = (0 - ty) / scale;
+      const cropSize = vw / scale;      // 裁剪框对应的原始尺寸
+      const sx = Math.max(0, Math.min(ow - cropSize, origX));
+      const sy = Math.max(0, Math.min(oh - cropSize, origY));
+      const size = Math.min(cropSize, ow - sx, oh - sy);
+
+      const canvas = document.createElement("canvas");
+      canvas.width = 256;
+      canvas.height = 256;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage($("cropImg"), sx, sy, size, size, 0, 0, 256, 256);
+      avatarBase64 = canvas.toDataURL("image/jpeg", 0.85);
+
+      const previewImg = document.createElement("img");
+      previewImg.src = avatarBase64;
+      $("avatarPreview").innerHTML = "";
+      $("avatarPreview").appendChild(previewImg);
+      $("editMsg").textContent = "头像已裁剪好";
+      $("editMsg").className = "msg ok";
+      closeCropModal();
     };
 
     $("submitEdit").onclick = async () => {
