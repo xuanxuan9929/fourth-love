@@ -371,6 +371,98 @@
     .edit-msg.err { color:#c0392b; }
     .hidden-input { display:none !important; }
 
+    /* 遇见页 */
+    .discover-wrap { padding: 16px 14px 20px; }
+    .discover-title { font-size: 24px; font-weight: 700; color: var(--accent); margin-bottom: 14px; }
+    .match-banner {
+      background: linear-gradient(135deg, #fbe7ec, #f6e2f2);
+      border-radius: 18px; padding: 20px; display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 16px; cursor: pointer;
+    }
+    .match-h { font-size: 19px; font-weight: 700; }
+    .match-d { font-size: 13px; color: var(--sub); margin: 6px 0; }
+    .match-go { font-size: 14px; color: var(--accent); font-weight: 600; }
+    .match-icon { font-size: 34px; }
+    .discover-tabs { display: flex; gap: 10px; margin-bottom: 14px; }
+    .dtab {
+      padding: 8px 22px; border-radius: 20px; background: #fff; color: var(--sub);
+      font-size: 14px; cursor: pointer; border: 1px solid var(--line);
+    }
+    .dtab.on { background: linear-gradient(90deg, #d4758c, #a06ee0); color: #fff; border-color: transparent; }
+    .discover-sub { font-size: 15px; font-weight: 600; margin-bottom: 12px; }
+    .user-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .user-card {
+      background: #fff; border-radius: 16px; overflow: hidden; cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,.05); position: relative;
+    }
+    .user-photo {
+      width: 100%; aspect-ratio: 4/5; background: var(--accent-light);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 44px; font-weight: 700; color: #fff; overflow: hidden;
+    }
+    .user-photo img { width: 100%; height: 100%; object-fit: cover; }
+    .active-badge {
+      position: absolute; top: 10px; left: 10px;
+      background: rgba(0,0,0,.45); color: #fff; font-size: 11px;
+      border-radius: 12px; padding: 3px 10px; display: flex; align-items: center; gap: 5px;
+    }
+    .active-badge .dot { width: 7px; height: 7px; border-radius: 50%; background: #2ecc71; }
+    .user-card .uinfo {
+      display: flex; align-items: center; gap: 7px; padding: 10px 12px;
+    }
+    .user-card .mini-av {
+      width: 30px; height: 30px; border-radius: 50%; background: var(--accent);
+      color: #fff; display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; flex-shrink: 0; overflow: hidden;
+    }
+    .user-card .mini-av img { width: 100%; height: 100%; object-fit: cover; }
+    .user-card .uinfo .uname {
+      font-size: 13px; font-weight: 600; max-width: 70px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .user-card .uinfo .ugender { font-size: 12px; font-weight: 600; }
+    .user-card .uinfo .ugender.f { color: #e85d8a; }
+    .user-card .uinfo .ugender.m { color: #5b8def; }
+    .user-card .uinfo .uage { font-size: 12px; color: var(--sub); }
+
+    /* 资料详情弹窗 */
+    .pv-card {
+      background: #fff; border-radius: 20px; padding: 22px; width: 100%; max-width: 400px;
+      max-height: 85vh; overflow-y: auto; position: relative;
+    }
+    .pv-card .close {
+      position: absolute; right: 16px; top: 14px; font-size: 26px; color: var(--sub);
+      background: none; border: none; cursor: pointer; line-height: 1;
+    }
+    .pv-head { display: flex; align-items: center; gap: 14px; }
+    .pv-avatar {
+      width: 72px; height: 72px; border-radius: 50%; background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; font-weight: 700; color: #fff; overflow: hidden; flex-shrink: 0;
+    }
+    .pv-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .pv-nick { font-size: 19px; font-weight: 700; }
+    .pv-meta { font-size: 13px; color: var(--sub); margin-top: 4px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .pv-crown { font-size: 22px; margin-left: auto; }
+    .pv-id {
+      display: inline-block; background: var(--accent-light); color: var(--accent);
+      border-radius: 12px; padding: 4px 12px; font-size: 12px; margin-top: 12px;
+    }
+    .pv-bio { font-size: 14px; line-height: 1.6; color: var(--ink); margin-top: 12px; }
+    .pv-section { margin-top: 16px; }
+    .pv-sec-title { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+    .pv-photos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .pv-photos img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; }
+    .pv-info-row { display: flex; padding: 7px 0; font-size: 13px; border-bottom: 1px solid #f7f2f4; }
+    .pv-info-row:last-child { border-bottom: none; }
+    .pv-info-row .k { width: 70px; color: var(--sub); flex-shrink: 0; }
+    .pv-info-row .v { color: var(--ink); }
+    .pv-interests { display: flex; flex-wrap: wrap; gap: 8px; }
+    .pv-interests .itag {
+      background: var(--accent-light); color: var(--accent); font-size: 12px;
+      padding: 4px 12px; border-radius: 12px;
+    }
+
     .pick-row { display:flex; align-items:center; gap:12px; padding:13px 0; border-bottom:1px solid #f7f2f4; cursor:pointer; }
     .pick-row:last-child { border-bottom:none; }
     .pick-row .label { width:64px; font-size:14px; flex-shrink:0; }
@@ -486,7 +578,58 @@
     </div>
 
     <div id="pageDiscover" class="hidden">
-      <div class="empty">遇见功能开发中...</div>
+      <div class="discover-wrap">
+        <div class="discover-title">遇见</div>
+        <div class="match-banner" id="matchBanner">
+          <div class="match-text">
+            <div class="match-h">每日匹配</div>
+            <div class="match-d">左右滑动遇见心动的 TA</div>
+            <div class="match-go">即将上线 →</div>
+          </div>
+          <div class="match-icon">✨</div>
+        </div>
+        <div class="discover-tabs">
+          <div class="dtab on" data-filter="active">活跃</div>
+          <div class="dtab" data-filter="new">新人</div>
+        </div>
+        <div class="discover-sub">此刻在这里的同频朋友</div>
+        <div class="user-grid" id="userGrid">
+          <div class="empty" style="grid-column:1/-1;">加载中...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 用户资料详情弹窗 -->
+    <div class="modal-overlay hidden" id="profileViewModal">
+      <div class="pv-card">
+        <button class="close" id="pvClose">×</button>
+        <div class="pv-head">
+          <div class="pv-avatar" id="pvAvatar"></div>
+          <div class="pv-basic">
+            <div class="pv-nick" id="pvNick"></div>
+            <div class="pv-meta">
+              <span id="pvGender"></span>
+              <span id="pvAge"></span>
+              <span id="pvLocation"></span>
+            </div>
+          </div>
+          <div class="pv-crown hidden" id="pvCrown">👑</div>
+        </div>
+        <div class="pv-id" id="pvId"></div>
+        <div class="pv-bio" id="pvBio"></div>
+        <div class="pv-section hidden" id="pvPhotosSec">
+          <div class="pv-sec-title">照片墙</div>
+          <div class="pv-photos" id="pvPhotos"></div>
+        </div>
+        <div class="pv-section" id="pvInfoSec">
+          <div class="pv-sec-title">详细资料</div>
+          <div id="pvInfoList"></div>
+        </div>
+        <div class="pv-section hidden" id="pvInterestsSec">
+          <div class="pv-sec-title">兴趣爱好</div>
+          <div class="pv-interests" id="pvInterests"></div>
+        </div>
+      </div>
     </div>
 
     <div id="pageChat" class="hidden">
@@ -593,8 +736,13 @@
         </div>
       </div>
 
-      <div class="section-title">更多资料</div>
+            <div class="section-title">更多资料</div>
       <div class="edit-card">
+        <div class="pick-row" id="genderRow">
+          <div class="label">性别</div>
+          <div class="value" id="genderDisplay">未设置</div>
+          <div class="arrow">›</div>
+        </div>
         <div class="edit-row" id="birthdayRow" style="cursor:pointer;">
           <div class="label">生日</div>
           <div class="value" id="birthdayDisplay" style="text-align:right;color:var(--ink);">未设置</div>
@@ -1085,6 +1233,7 @@
           $(id).classList.add("hidden");
         });
         $("page" + page.charAt(0).toUpperCase() + page.slice(1)).classList.remove("hidden");
+        if (page === "discover") loadDiscover();
       };
     });
 
@@ -1137,8 +1286,9 @@
     const INTEREST_PRESETS = ["阅读","音乐","手作","舞蹈","花艺","旅行","美食","电影","摄影","游戏","运动","宠物","美妆","穿搭","二次元","桌游","咖啡","音乐节","追剧","写作"];
     let editInterests = [];
     let editPhotos = [];
-    let editBirthday = "";
+        let editBirthday = "";
     let editLocationVal = "";
+    let editGender = "";
 
     // ===== 通用滚轮选择器 =====
     let pickerCols = [];
@@ -1223,6 +1373,18 @@
       if (month === 2 && (year % 4 === 0 && year % 100 !== 0 || year % 400 === 0)) return 29;
       return daysInMonth[month - 1];
     }
+
+        // ===== 性别选择 =====
+    $("genderRow").onclick = () => {
+      openPicker("选择性别", [
+        { values: ["女", "男", "保密"], selected: editGender === "女" ? 0 : editGender === "男" ? 1 : 2 }
+      ], vals => {
+        editGender = vals[0];
+        const el = $("genderDisplay");
+        el.textContent = editGender;
+        el.classList.add("set");
+      });
+    };
 
     // ===== 生日选择 =====
     $("birthdayRow").onclick = () => {
@@ -1407,6 +1569,9 @@
       $("editEmailShow").textContent = currentUser?.email || "";
       editBirthday = p.birthday || "";
       $("birthdayDisplay").textContent = formatBirthday(editBirthday);
+      editGender = p.gender || "";
+      $("genderDisplay").textContent = editGender || "未设置";
+      $("genderDisplay").classList.toggle("set", !!editGender);
       editLocationVal = p.location || "";
       const locEl = $("locationDisplay");
       locEl.textContent = editLocationVal || "未设置";
@@ -1584,6 +1749,7 @@
           nickname,
           bio: $("editBio").value.trim(),
           avatar_url,
+          gender: editGender,
           birthday: editBirthday,
           location: editLocationVal,
           height: $("editHeight").value ? parseInt($("editHeight").value) : null,
@@ -1708,6 +1874,140 @@
       $("payModal").classList.remove("hidden");
     };
     $("payClose").onclick = () => $("payModal").classList.add("hidden");
+
+    // ===== 遇见页 =====
+    let discoverFilter = "active";
+    let discoverUsers = [];
+
+    function calcAge(birthday) {
+      if (!birthday) return null;
+      const p = birthday.split("-").map(Number);
+      if (p.length < 3) return null;
+      const now = new Date();
+      let age = now.getFullYear() - p[0];
+      const md = (now.getMonth() + 1) - p[1];
+      if (md < 0 || (md === 0 && now.getDate() < p[2])) age--;
+      return age >= 0 && age < 120 ? age : null;
+    }
+
+    function isActive(u) {
+      if (!u.updated_at) return false;
+      return (Date.now() - new Date(u.updated_at).getTime()) < 24 * 3600 * 1000;
+    }
+
+    async function loadDiscover() {
+      try {
+        const data = await apiCall("/rest/v1/profiles?select=*&order=updated_at.desc&limit=100");
+        discoverUsers = data.filter(u => u.id !== currentUser?.id);
+        renderDiscover();
+      } catch (e) {
+        $("userGrid").innerHTML = `<div class="empty" style="grid-column:1/-1;">加载失败：${escapeHtml(e.message)}</div>`;
+      }
+    }
+
+    function renderDiscover() {
+      const grid = $("userGrid");
+      let list = [...discoverUsers];
+      if (discoverFilter === "active") {
+        list = list.filter(isActive);
+      } else {
+        list = list.filter(u => u.created_at && (Date.now() - new Date(u.created_at).getTime()) < 7 * 24 * 3600 * 1000);
+      }
+      if (list.length === 0) {
+        grid.innerHTML = `<div class="empty" style="grid-column:1/-1;">暂无${discoverFilter === "active" ? "活跃" : "新加入"}的用户，快去发个帖子让大家认识你吧～</div>`;
+        return;
+      }
+      grid.innerHTML = list.map(u => {
+        const nick = u.nickname || "匿名";
+        const avatar = u.avatar_url
+          ? `<img src="${u.avatar_url}">`
+          : nick.charAt(0).toUpperCase();
+        const active = isActive(u);
+        const age = calcAge(u.birthday);
+        let genderHtml = "";
+        if (u.gender === "女") genderHtml = '<span class="ugender f">♀</span>';
+        else if (u.gender === "男") genderHtml = '<span class="ugender m">♂</span>';
+        const ageHtml = age !== null ? `<span class="uage">${age}岁</span>` : "";
+        return `
+          <div class="user-card" data-id="${u.id}">
+            <div class="user-photo">${avatar}</div>
+            ${active ? '<div class="active-badge"><span class="dot"></span>活跃</div>' : ''}
+            <div class="uinfo">
+              <div class="mini-av">${u.avatar_url ? `<img src="${u.avatar_url}">` : nick.charAt(0).toUpperCase()}</div>
+              <span class="uname">${escapeHtml(nick)}</span>
+              ${genderHtml}${ageHtml}
+            </div>
+          </div>
+        `;
+      }).join("");
+      grid.querySelectorAll(".user-card").forEach(card => {
+        card.onclick = () => {
+          const u = discoverUsers.find(x => x.id === card.dataset.id);
+          if (u) openProfileView(u);
+        };
+      });
+    }
+
+    document.querySelectorAll(".dtab").forEach(tab => {
+      tab.onclick = () => {
+        discoverFilter = tab.dataset.filter;
+        document.querySelectorAll(".dtab").forEach(t => t.classList.remove("on"));
+        tab.classList.add("on");
+        renderDiscover();
+      };
+    });
+
+    $("matchBanner").onclick = () => alert("每日匹配功能即将上线，敬请期待～");
+
+    function openProfileView(u) {
+      const nick = u.nickname || "匿名";
+      renderAvatar($("pvAvatar"), u, nick);
+      $("pvNick").textContent = nick + (isVip(u) ? " 👑" : "");
+      const age = calcAge(u.birthday);
+      const parts = [];
+      if (u.gender) parts.push(u.gender);
+      if (age !== null) parts.push(age + "岁");
+      $("pvGender").textContent = parts.join(" · ");
+      $("pvLocation").textContent = u.location || "";
+      $("pvId").textContent = "# ID: " + (u.display_id || "未知");
+      $("pvBio").textContent = u.bio || "这个人很懒，还没写简介";
+      // 照片墙
+      const photos = u.photos || [];
+      if (photos.length) {
+        $("pvPhotosSec").classList.remove("hidden");
+        $("pvPhotos").innerHTML = photos.map(src => `<img src="${src}">`).join("");
+      } else {
+        $("pvPhotosSec").classList.add("hidden");
+      }
+      // 详细资料
+      const rows = [
+        ["身高", u.height ? u.height + "cm" : ""],
+        ["体重", u.weight ? u.weight + "kg" : ""],
+        ["学历", u.education || ""],
+        ["职业", u.job || ""],
+        ["年收入", u.income || ""],
+        ["情感状态", u.relationship || ""],
+        ["星座", u.constellation || ""]
+      ].filter(r => r[1]);
+      if (rows.length) {
+        $("pvInfoSec").classList.remove("hidden");
+        $("pvInfoList").innerHTML = rows.map(r =>
+          `<div class="pv-info-row"><span class="k">${r[0]}</span><span class="v">${escapeHtml(r[1])}</span></div>`
+        ).join("");
+      } else {
+        $("pvInfoSec").classList.add("hidden");
+      }
+      // 爱好
+      const interests = u.interests || [];
+      if (interests.length) {
+        $("pvInterestsSec").classList.remove("hidden");
+        $("pvInterests").innerHTML = interests.map(t => `<span class="itag">${escapeHtml(t)}</span>`).join("");
+      } else {
+        $("pvInterestsSec").classList.add("hidden");
+      }
+      $("profileViewModal").classList.remove("hidden");
+    }
+    $("pvClose").onclick = () => $("profileViewModal").classList.add("hidden");
 
     async function handleAuthCallback() {
       const params = new URLSearchParams(location.search);
