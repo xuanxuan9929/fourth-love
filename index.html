@@ -382,14 +382,13 @@
     .picker-body { display:flex; height:210px; position:relative; }
     .picker-col { flex:1; overflow:hidden; position:relative; height:210px; }
     .picker-scroller {
-      height:210px; overflow-y:auto; scroll-snap-type:y mandatory;
+      height:210px; overflow-y:auto;
       -webkit-overflow-scrolling:touch; scrollbar-width:none;
     }
     .picker-scroller::-webkit-scrollbar { display:none; }
     .picker-pad { height:84px; }
     .picker-item {
       height:42px; line-height:42px; text-align:center; font-size:15px; color:var(--sub);
-      scroll-snap-align:center;
     }
     .picker-highlight {
       position:absolute; top:84px; left:0; right:0; height:42px; pointer-events:none;
@@ -1175,17 +1174,24 @@
       scroller.innerHTML = `<div class="picker-pad"></div>` +
         data.values.map(v => `<div class="picker-item">${v}</div>`).join("") +
         `<div class="picker-pad"></div>`;
-      scroller.scrollTop = data.selected * 42;
+      // 等布局完成后再定位初始项
+      requestAnimationFrame(() => {
+        scroller.scrollTop = data.selected * 42;
+      });
       let t;
       scroller.onscroll = () => {
         clearTimeout(t);
         t = setTimeout(() => {
           const idx = Math.max(0, Math.min(data.values.length - 1, Math.round(scroller.scrollTop / 42)));
+          const target = idx * 42;
+          if (Math.abs(scroller.scrollTop - target) > 1) {
+            scroller.scrollTop = target;
+          }
           if (idx !== data.selected) {
             data.selected = idx;
             if (colName !== "day") updateDayCol();
           }
-        }, 60);
+        }, 90);
       };
     }
 
