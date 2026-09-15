@@ -2138,30 +2138,36 @@
     }
 
     async function openMatchPage() {
-      const history = await loadSwipeHistory();
-      const used = history.length;
-      const limit = isVip(currentProfile) ? 10 : 3;
-      matchQuota = Math.max(0, limit - used);
-      $("matchQuota").textContent = `剩余 ${matchQuota} 次`;
-
-      if (matchQuota <= 0) {
-        renderMatchEmpty("今日匹配次数已用完");
-        return;
-      }
-
-      const todaySwipedIds = history.map(s => s.target_id);
-      const allUsers = await apiCall(`/rest/v1/profiles?select=*&limit=200`);
-      const candidates = allUsers.filter(u =>
-        u.id !== currentUser.id && !todaySwipedIds.includes(u.id)
-      );
-      if (candidates.length === 0) {
-        renderMatchEmpty("今天没有更多可匹配的人了");
-        return;
-      }
-      matchDeck = candidates.sort(() => Math.random() - 0.5).slice(0, matchQuota);
       $("matchPage").classList.remove("hidden");
-      $("matchActions").style.display = "flex";
-      renderMatchDeck();
+      $("matchStage").innerHTML = `<div class="match-empty"><span class="big">🔄</span>正在加载...</div>`;
+      $("matchActions").style.display = "none";
+      try {
+        const history = await loadSwipeHistory();
+        const used = history.length;
+        const limit = isVip(currentProfile) ? 10 : 3;
+        matchQuota = Math.max(0, limit - used);
+        $("matchQuota").textContent = `剩余 ${matchQuota} 次`;
+
+        if (matchQuota <= 0) {
+          renderMatchEmpty("今日匹配次数已用完");
+          return;
+        }
+
+        const todaySwipedIds = history.map(s => s.target_id);
+        const allUsers = await apiCall(`/rest/v1/profiles?select=*&limit=200`);
+        const candidates = allUsers.filter(u =>
+          u.id !== currentUser.id && !todaySwipedIds.includes(u.id)
+        );
+        if (candidates.length === 0) {
+          renderMatchEmpty("今天没有更多可匹配的人了");
+          return;
+        }
+        matchDeck = candidates.sort(() => Math.random() - 0.5).slice(0, matchQuota);
+        $("matchActions").style.display = "flex";
+        renderMatchDeck();
+      } catch (e) {
+        renderMatchEmpty("加载失败：" + e.message);
+      }
     }
 
     function renderMatchEmpty(msg) {
