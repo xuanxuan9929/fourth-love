@@ -463,6 +463,91 @@
       padding: 4px 12px; border-radius: 12px;
     }
 
+    /* 每日匹配 */
+    .match-page {
+      position: fixed; inset: 0; z-index: 260; background: var(--bg);
+      overflow-y: auto; padding-bottom: 100px;
+    }
+    .match-topbar {
+      position: sticky; top: 0; background: rgba(255,255,255,.95); backdrop-filter: blur(10px);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 13px 18px; border-bottom: 1px solid var(--line); z-index: 5;
+    }
+    .match-topbar .back { background:none; border:none; color: var(--sub); font-size:24px; cursor:pointer; padding:0; line-height:1; }
+    .match-topbar .title { font-size:16px; font-weight:600; }
+    .match-topbar .quota {
+      font-size:12px; color:#fff; background:linear-gradient(90deg,#d4758c,#a06ee0);
+      border-radius:14px; padding:4px 12px;
+    }
+    .match-card-stage {
+      position: relative; width: 100%; max-width: 360px; margin: 20px auto;
+      height: 460px; display: flex; align-items: center; justify-content: center;
+    }
+    .match-card {
+      position: absolute; width: 86%; max-width: 320px; height: 420px;
+      background: #fff; border-radius: 22px; overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,.12); cursor: grab;
+      transition: transform .35s ease, opacity .35s ease;
+      will-change: transform;
+    }
+    .match-card .mc-photo {
+      height: 62%; background: var(--accent-light);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 80px; font-weight: 700; color: #fff; overflow: hidden;
+    }
+    .match-card .mc-photo img { width: 100%; height: 100%; object-fit: cover; }
+    .match-card .mc-body { padding: 16px 18px; }
+    .match-card .mc-name { font-size: 21px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .match-card .mc-meta { font-size: 14px; color: var(--sub); margin-top: 6px; display: flex; gap: 10px; flex-wrap: wrap; }
+    .match-card .mc-bio { font-size: 13px; color: var(--ink); margin-top: 10px; line-height: 1.6;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .match-card .mc-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .match-card .mc-tags span {
+      background: var(--accent-light); color: var(--accent); font-size: 12px;
+      padding: 3px 10px; border-radius: 10px;
+    }
+    .match-stamp {
+      position: absolute; top: 130px; font-size: 60px; font-weight: 900; z-index: 5;
+      transform: rotate(-18deg); opacity: 0; pointer-events: none;
+    }
+    .match-stamp.like { color: #d4758c; left: 16%; }
+    .match-stamp.nope { color: #9a8b90; right: 16%; transform: rotate(18deg); }
+    .match-actions { display: flex; justify-content: center; gap: 36px; margin-top: 24px; }
+    .match-btn {
+      width: 64px; height: 64px; border-radius: 50%; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; font-size: 30px;
+      transition: transform .15s; box-shadow: 0 6px 16px rgba(0,0,0,.12);
+    }
+    .match-btn:active { transform: scale(.88); }
+    .match-btn.skip { background: #fff; color: var(--sub); }
+    .match-btn.like { background: linear-gradient(135deg, #d4758c, #a06ee0); color: #fff; }
+    .match-empty {
+      text-align: center; color: var(--sub); padding: 120px 30px; font-size: 15px; line-height: 1.8;
+    }
+    .match-empty .big { font-size: 54px; display: block; margin-bottom: 14px; }
+    .match-done {
+      position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 300;
+      display: flex; align-items: center; justify-content: center; padding: 24px;
+    }
+    .match-done-card {
+      background: #fff; border-radius: 20px; padding: 30px 24px; text-align: center;
+      width: 100%; max-width: 320px;
+    }
+    .match-done-card .big { font-size: 60px; display: block; margin-bottom: 10px; }
+    .match-done-card h3 { font-size: 20px; margin-bottom: 6px; }
+    .match-done-card p { font-size: 14px; color: var(--sub); line-height: 1.7; }
+    .match-done-card .pair-avatars { display: flex; justify-content: center; gap: 14px; margin: 18px 0; }
+    .match-done-card .pa {
+      width: 62px; height: 62px; border-radius: 50%; background: var(--accent);
+      color: #fff; display: flex; align-items: center; justify-content: center;
+      font-size: 24px; font-weight: 700; overflow: hidden;
+    }
+    .match-done-card .pa img { width: 100%; height: 100%; object-fit: cover; }
+    .match-done-btn {
+      width: 100%; margin-top: 16px; padding: 13px; border: none; border-radius: 24px;
+      background: linear-gradient(90deg, #d4758c, #a06ee0); color: #fff; font-size: 15px; font-weight: 600; cursor: pointer;
+    }
+
     .pick-row { display:flex; align-items:center; gap:12px; padding:13px 0; border-bottom:1px solid #f7f2f4; cursor:pointer; }
     .pick-row:last-child { border-bottom:none; }
     .pick-row .label { width:64px; font-size:14px; flex-shrink:0; }
@@ -824,6 +909,34 @@
     </div>
     <input type="file" id="avatarFile" accept="image/*" class="hidden-input">
     <input type="file" id="photoFile" accept="image/*" multiple class="hidden-input">
+  </div>
+
+  <!-- 每日匹配页 -->
+  <div class="match-page hidden" id="matchPage">
+    <div class="match-topbar">
+      <button class="back" id="matchBack">‹</button>
+      <div class="title">每日匹配</div>
+      <div class="quota" id="matchQuota">剩余 0 次</div>
+    </div>
+    <div class="match-card-stage" id="matchStage"></div>
+    <div class="match-actions" id="matchActions" style="display:none;">
+      <button class="match-btn skip" id="matchSkip">✕</button>
+      <button class="match-btn like" id="matchLike">♥</button>
+    </div>
+  </div>
+
+  <!-- 配对成功弹窗 -->
+  <div class="match-done hidden" id="matchDone">
+    <div class="match-done-card">
+      <span class="big">🎉</span>
+      <h3>配对成功！</h3>
+      <p>你和对 ta 都点击了喜欢，<br>等私信功能上线后就可以聊天啦</p>
+      <div class="pair-avatars">
+        <div class="pa" id="pairMe"></div>
+        <div class="pa" id="pairTa"></div>
+      </div>
+      <button class="match-done-btn" id="matchDoneBtn">继续看看</button>
+    </div>
   </div>
 
   <!-- 通用滚轮选择器弹窗 -->
@@ -1957,7 +2070,7 @@
       };
     });
 
-    $("matchBanner").onclick = () => alert("每日匹配功能即将上线，敬请期待～");
+    // 每日匹配入口已绑定到 matchBanner
 
     function openProfileView(u) {
       const nick = u.nickname || "匿名";
@@ -2008,6 +2121,197 @@
       $("profileViewModal").classList.remove("hidden");
     }
     $("pvClose").onclick = () => $("profileViewModal").classList.add("hidden");
+
+    // ===== 每日匹配 =====
+    let matchDeck = [];
+    let matchQuota = 0;
+
+    function todayKey() {
+      const t = new Date();
+      return `${t.getFullYear()}-${t.getMonth()+1}-${t.getDate()}`;
+    }
+
+    async function loadSwipeHistory() {
+      const key = todayKey();
+      const data = await apiCall(`/rest/v1/swipes?user_id=eq.${currentUser.id}&created_at=gte.${key}&order=created_at.desc&limit=50`);
+      return data || [];
+    }
+
+    async function openMatchPage() {
+      const history = await loadSwipeHistory();
+      const used = history.length;
+      const limit = isVip(currentProfile) ? 10 : 3;
+      matchQuota = Math.max(0, limit - used);
+      $("matchQuota").textContent = `剩余 ${matchQuota} 次`;
+
+      if (matchQuota <= 0) {
+        renderMatchEmpty("今日匹配次数已用完");
+        return;
+      }
+
+      const todaySwipedIds = history.map(s => s.target_id);
+      const allUsers = await apiCall(`/rest/v1/profiles?select=*&limit=200`);
+      const candidates = allUsers.filter(u =>
+        u.id !== currentUser.id && !todaySwipedIds.includes(u.id)
+      );
+      if (candidates.length === 0) {
+        renderMatchEmpty("今天没有更多可匹配的人了");
+        return;
+      }
+      matchDeck = candidates.sort(() => Math.random() - 0.5).slice(0, matchQuota);
+      $("matchPage").classList.remove("hidden");
+      $("matchActions").style.display = "flex";
+      renderMatchDeck();
+    }
+
+    function renderMatchEmpty(msg) {
+      $("matchPage").classList.remove("hidden");
+      $("matchStage").innerHTML = `<div class="match-empty"><span class="big">😴</span>${msg}<br>明天再来看看吧</div>`;
+      $("matchActions").style.display = "none";
+    }
+
+    function renderMatchDeck() {
+      const stage = $("matchStage");
+      stage.innerHTML = "";
+      matchDeck.forEach((u, i) => {
+        const card = buildMatchCard(u, i);
+        stage.appendChild(card);
+      });
+    }
+
+    function buildMatchCard(u, idx) {
+      const nick = u.nickname || "匿名";
+      const avatar = u.avatar_url ? `<img src="${u.avatar_url}">` : nick.charAt(0).toUpperCase();
+      const age = calcAge(u.birthday);
+      const metaParts = [];
+      if (u.gender) metaParts.push(u.gender);
+      if (age !== null) metaParts.push(age + "岁");
+      if (u.location) metaParts.push(u.location);
+      const tags = (u.interests || []).slice(0, 4);
+
+      const card = document.createElement("div");
+      card.className = "match-card";
+      card.dataset.uid = u.id;
+      card.style.zIndex = 10 - idx;
+      card.style.transform = `translateY(${idx * -6}px) scale(${1 - idx * 0.03})`;
+      card.style.opacity = idx === 0 ? 1 : (1 - idx * 0.08);
+      card.innerHTML = `
+        <div class="match-stamp like">♥</div>
+        <div class="match-stamp nope">✕</div>
+        <div class="mc-photo">${avatar}</div>
+        <div class="mc-body">
+          <div class="mc-name">${escapeHtml(nick)}${isVip(u) ? ' 👑' : ''}</div>
+          <div class="mc-meta">${metaParts.map(x => `<span>${escapeHtml(x)}</span>`).join("")}</div>
+          <div class="mc-bio">${escapeHtml(u.bio || "这个人很懒，还没写简介")}</div>
+          ${tags.length ? `<div class="mc-tags">${tags.map(t => `<span>${escapeHtml(t)}</span>`).join("")}</div>` : ""}
+        </div>
+      `;
+      if (idx === 0) bindCardSwipe(card, u);
+      return card;
+    }
+
+    function bindCardSwipe(card, u) {
+      let startX = 0, dragging = false, dx = 0;
+      card.addEventListener("pointerdown", (e) => {
+        dragging = true; startX = e.clientX; dx = 0;
+        card.setPointerCapture(e.pointerId);
+      });
+      card.addEventListener("pointermove", (e) => {
+        if (!dragging) return;
+        dx = e.clientX - startX;
+        card.style.transition = "none";
+        card.style.transform = `translateX(${dx}px) rotate(${dx * 0.08}deg)`;
+        const like = card.querySelector(".match-stamp.like");
+        const nope = card.querySelector(".match-stamp.nope");
+        if (dx > 40) { like.style.opacity = 1; nope.style.opacity = 0; }
+        else if (dx < -40) { nope.style.opacity = 1; like.style.opacity = 0; }
+        else { like.style.opacity = 0; nope.style.opacity = 0; }
+      });
+      card.addEventListener("pointerup", () => {
+        if (!dragging) return;
+        dragging = false;
+        card.style.transition = "transform .35s ease";
+        const threshold = 80;
+        if (dx > threshold) {
+          card.style.transform = "translateX(600px) rotate(30deg)";
+          card.style.opacity = 0;
+          setTimeout(() => advanceMatch(u, "like"), 320);
+        } else if (dx < -threshold) {
+          card.style.transform = "translateX(-600px) rotate(-30deg)";
+          card.style.opacity = 0;
+          setTimeout(() => advanceMatch(u, "skip"), 320);
+        } else {
+          card.style.transform = "translateX(0) rotate(0)";
+        }
+      });
+    }
+
+    async function advanceMatch(target, action) {
+      try {
+        await apiCall("/rest/v1/swipes", "POST", {
+          user_id: currentUser.id, target_id: target.id, action
+        });
+      } catch (e) { /* 已存在则忽略 */ }
+      matchDeck.shift();
+      matchQuota--;
+
+      if (action === "like") {
+        const mutual = await checkMutualLike(target.id);
+        if (mutual) {
+          await createMatch(currentUser.id, target.id);
+          showMatchDone(target);
+          matchDeck = [];
+          $("matchStage").innerHTML = "";
+          $("matchActions").style.display = "none";
+          $("matchQuota").textContent = `剩余 ${matchQuota} 次`;
+          return;
+        }
+      }
+
+      if (matchQuota <= 0 || matchDeck.length === 0) {
+        renderMatchEmpty("今日匹配次数已用完");
+      } else {
+        renderMatchDeck();
+      }
+      $("matchQuota").textContent = `剩余 ${matchQuota} 次`;
+    }
+
+    async function checkMutualLike(targetId) {
+      const data = await apiCall(`/rest/v1/swipes?user_id=eq.${targetId}&target_id=eq.${currentUser.id}&action=eq.like&limit=1`);
+      return data && data.length > 0;
+    }
+
+    async function createMatch(a, b) {
+      const x = a < b ? a : b;
+      const y = a < b ? b : a;
+      try {
+        await apiCall("/rest/v1/matches", "POST", { user_a: x, user_b: y });
+      } catch (e) { /* 已存在则忽略 */ }
+    }
+
+    function showMatchDone(target) {
+      $("pairMe").innerHTML = currentProfile?.avatar_url
+        ? `<img src="${currentProfile.avatar_url}">`
+        : (currentProfile?.nickname || "我").charAt(0).toUpperCase();
+      $("pairTa").innerHTML = target.avatar_url
+        ? `<img src="${target.avatar_url}">`
+        : (target.nickname || "TA").charAt(0).toUpperCase();
+      $("matchDone").classList.remove("hidden");
+    }
+
+    $("matchSkip").onclick = () => {
+      const u = matchDeck[0];
+      if (u) { advanceMatch(u, "skip"); }
+    };
+    $("matchLike").onclick = () => {
+      const u = matchDeck[0];
+      if (u) { advanceMatch(u, "like"); }
+    };
+    $("matchBack").onclick = () => $("matchPage").classList.add("hidden");
+    $("matchDoneBtn").onclick = () => $("matchDone").classList.add("hidden");
+
+    // 遇见页横幅入口改为打开每日匹配
+    $("matchBanner").onclick = openMatchPage;
 
     async function handleAuthCallback() {
       const params = new URLSearchParams(location.search);
