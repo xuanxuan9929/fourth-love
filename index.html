@@ -59,6 +59,12 @@
     .field input, .field textarea { width: 100%; padding: 11px 12px; border: 1px solid var(--line);
       border-radius: 10px; font-size: 15px; outline: none; background: #fdfbfa; font-family: inherit;
     }
+    .pick-row-mini {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 11px 12px; border: 1px solid var(--line); border-radius: 10px;
+      background: #fdfbfa; cursor: pointer;
+    }
+    .pick-row-mini .arrow { color: var(--sub); font-size: 12px; }
     .field input:focus, .field textarea:focus { border-color: var(--accent); }
     .submit { width: 100%; padding: 12px; background: var(--accent); color: #fff;
       border: none; border-radius: 10px; font-size: 15px; cursor: pointer; margin-top: 6px;
@@ -645,6 +651,20 @@
         <label>昵称</label>
         <input type="text" id="nickname" placeholder="给自己起个名字">
       </div>
+      <div class="field hidden" id="genderField">
+        <label>性别</label>
+        <div class="pick-row-mini" id="regGenderRow">
+          <span id="regGenderDisplay">请选择</span>
+          <span class="arrow">›</span>
+        </div>
+      </div>
+      <div class="field hidden" id="birthdayField">
+        <label>生日</label>
+        <div class="pick-row-mini" id="regBirthdayRow">
+          <span id="regBirthdayDisplay">请选择（选填）</span>
+          <span class="arrow">›</span>
+        </div>
+      </div>
       <button class="submit" id="submitBtn">登录</button>
       <div class="msg" id="msg"></div>
     </div>
@@ -1145,13 +1165,13 @@
       const data = await apiCall(`/rest/v1/profiles?id=eq.${userId}&limit=1`);
       return data[0] || null;
     }
-    async function ensureProfile(user) {
+    async function ensureProfile(user, extra = {}) {
       let profile = await getProfile(user.id);
       if (!profile) {
         // 首次登录自动创建资料
         const nickname = user.user_metadata?.nickname || user.email?.split("@")[0] || "用户";
         await apiCall("/rest/v1/profiles", "POST", {
-          id: user.id, nickname, bio: "", avatar_url: ""
+          id: user.id, nickname, bio: "", avatar_url: "", ...extra
         });
         profile = await getProfile(user.id);
       }
@@ -1192,6 +1212,8 @@
       const isLogin = mode === "login";
       $("authTitle").textContent = isLogin ? "登录" : "注册";
       $("nickField").classList.toggle("hidden", isLogin);
+      $("genderField").classList.toggle("hidden", isLogin);
+      $("birthdayField").classList.toggle("hidden", isLogin);
       $("submitBtn").textContent = isLogin ? "登录" : "注册";
       $("tabLogin").classList.toggle("on", isLogin);
       $("tabSignup").classList.toggle("on", !isLogin);
@@ -1305,6 +1327,56 @@
       $("navbar").classList.add("hidden");
     }
 
+    // ===== 注册资料滚轮（性别/生日）=====
+    let regGender = "";
+    let regBirthday = "";
+
+    $("regGenderRow").onclick = () => {
+      openPicker("选择性别", [
+        { values: ["女", "男", "保密"], selected: regGender === "女" ? 0 : regGender === "男" ? 1 : 2 }
+      ], vals => {
+        regGender = vals[0];
+        $("regGenderDisplay").textContent = regGender;
+        $("regGenderDisplay").style.color = "var(--ink)";
+      });
+    };
+
+    $("regBirthdayRow").onclick = () => {
+      let y = 1990, m = 1, d = 1;
+      if (regBirthday) {
+        const p = regBirthday.split("-").map(Number);
+        y = p[0]; m = p[1]; d = p[2];
+      }
+      const years = Array.from({length: 51}, (_, i) => (1960 + i) + "年");
+      const months = Array.from({length: 12}, (_, i) => (i + 1) + "月");
+      const cols = [
+        { values: years, selected: y - 1960 },
+        { values: months, selected: m - 1 },
+        { values: Array.from({length: getDaysInMonth(y, m)}, (_, i) => (i + 1) + "日"), selected: d - 1 }
+      ];
+      const rebuildDay = () => {
+        const yy = 1960 + cols[0].selected;
+        const mm = cols[1].selected + 1;
+        const max = getDaysInMonth(yy, mm);
+        const oldSel = getCenteredIndex(cols[2].scroller);
+        cols[2].values = Array.from({length: max}, (_, j) => (j + 1) + "日");
+        cols[2].selected = Math.min(oldSel, max - 1);
+        const newCol = buildPickerCol(cols[2]);
+        const body = $("pickerBody");
+        const old = body.querySelectorAll(".picker-col")[2];
+        body.replaceChild(newCol, old);
+        cols[2] = newCol;
+      };
+      cols[0].onChange = i => { cols[0].selected = i; rebuildDay(); };
+      cols[1].onChange = i => { cols[1].selected = i; rebuildDay(); };
+      openPicker("选择生日", cols, vals => {
+        const yy = parseInt(vals[0]), mm = parseInt(vals[1]), dd = parseInt(vals[2]);
+        regBirthday = yy + "-" + String(mm).padStart(2,"0") + "-" + String(dd).padStart(2,"0");
+        $("regBirthdayDisplay").textContent = yy + "年" + mm + "月" + dd + "日";
+        $("regBirthdayDisplay").style.color = "var(--ink)";
+      });
+    };
+
     $("tabLogin").onclick = () => switchMode("login");
     $("tabSignup").onclick = () => switchMode("signup");
 
@@ -1318,10 +1390,20 @@
       setMsg(authMode === "login" ? "登录中…" : "注册中…");
       try {
         if (authMode === "signup") {
+          if (!regGender) {
+            setMsg("注册请选性别", "err");
+            return;
+          }
           const data = await signUp(email, password, nickname);
           if (data.access_token && data.user) {
             setMsg("注册成功", "ok");
             renderAuthed(data.user);
+            // 注册成功后写入性别生日到资料
+            const extra = { gender: regGender };
+            if (regBirthday) extra.birthday = regBirthday;
+            ensureProfile(data.user, extra).then(() => {
+              getProfile(data.user.id).then(p => { if (p) { currentProfile = p; renderProfile(); } });
+            });
           } else {
             setMsg("注册成功！请去邮箱确认后，再回来登录", "ok");
           }
@@ -1331,7 +1413,12 @@
           renderAuthed(data.user);
         }
       } catch (e) {
-        setMsg(e.message, "err");
+        const msg = e.message || "出错了，稍后再试";
+        if (msg.toLowerCase().includes("already") || msg.includes("已注册") || msg.includes("registered") || msg.includes("exist")) {
+          setMsg("该邮箱已被注册，请直接登录", "err");
+        } else {
+          setMsg(msg, "err");
+        }
       }
     };
 
