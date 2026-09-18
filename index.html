@@ -2839,7 +2839,6 @@
       pvCurrentUser = u;
       origOpenProfileView(u);
       const isSelf = currentUser && u.id === currentUser.id;
-      $("pvMenuBtn").style.display = isSelf ? "none" : "block";
       $("pvActions").style.display = isSelf ? "none" : "flex";
       if (!isSelf) refreshFollowBtn(u.id);
     };;
@@ -2889,14 +2888,6 @@
       btn.textContent = isF ? "✓ 已关注" : "＋ 关注";
     }
 
-    $("pvMenuBtn").onclick = (e) => {
-      e.stopPropagation();
-      $("pvMenuList").classList.toggle("hidden");
-    };
-    document.addEventListener("click", () => {
-      if ($("pvMenuList")) $("pvMenuList").classList.add("hidden");
-    });
-
     function renderReportReasons() {
       $("reportReasons").innerHTML = REPORT_REASONS.map((r, i) =>
         '<div class="report-reason ' + (i === reportReasonIdx ? "on" : "") + '" data-i="' + i + '">' +
@@ -2906,8 +2897,7 @@
         el.onclick = () => { reportReasonIdx = parseInt(el.dataset.i); renderReportReasons(); };
       });
     }
-    $("pvReportItem").onclick = () => {
-      $("pvMenuList").classList.add("hidden");
+    $("pvReportBtn").onclick = () => {
       reportReasonIdx = 0;
       $("reportDetail").value = "";
       renderReportReasons();
@@ -2928,8 +2918,7 @@
       } catch (e) { alert("提交失败：" + e.message); }
     };
 
-    $("pvBlockItem").onclick = () => {
-      $("pvMenuList").classList.add("hidden");
+    $("pvBlockBtn").onclick = () => {
       blockTarget = pvCurrentUser;
       $("blockModal").classList.remove("hidden");
     };
