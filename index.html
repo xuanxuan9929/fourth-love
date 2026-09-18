@@ -931,6 +931,23 @@
     <input type="file" id="photoFile" accept="image/*" multiple class="hidden-input">
   </div>
 
+  <!-- 邮箱确认提示弹窗 -->
+  <div class="modal-overlay hidden" id="emailConfirmModal">
+    <div class="pv-card" style="text-align:center;max-width:320px;">
+      <div style="font-size:52px;margin-bottom:8px;">📮</div>
+      <h3 style="font-size:19px;margin-bottom:10px;">请查收确认邮件</h3>
+      <p style="font-size:14px;color:var(--sub);line-height:1.8;">
+        我们已向您的邮箱发送了确认链接。<br>
+        请打开邮箱，<b style="color:var(--accent);">点击链接</b>即可完成注册，<br>
+        之后即可正常登录。
+      </p>
+      <p style="font-size:12px;color:var(--sub);margin-top:12px;">
+        （没收到的话，记得看看垃圾邮件箱）
+      </p>
+      <button class="submit" style="margin-top:16px;" id="emailConfirmOk">我知道了</button>
+    </div>
+  </div>
+
   <!-- 每日匹配页 -->
   <div class="match-page hidden" id="matchPage">
     <div class="match-topbar">
@@ -1377,6 +1394,8 @@
       });
     };
 
+    $("emailConfirmOk").onclick = () => $("emailConfirmModal").classList.add("hidden");
+
     $("tabLogin").onclick = () => switchMode("login");
     $("tabSignup").onclick = () => switchMode("signup");
 
@@ -1405,7 +1424,9 @@
               getProfile(data.user.id).then(p => { if (p) { currentProfile = p; renderProfile(); } });
             });
           } else {
-            setMsg("注册成功！请去邮箱确认后，再回来登录", "ok");
+            // 注册成功，需要邮箱确认
+            $("emailConfirmModal").classList.remove("hidden");
+            setMsg("");
           }
         } else {
           const data = await signIn(email, password);
