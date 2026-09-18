@@ -447,6 +447,67 @@
       font-size: 15px; font-weight: 600; cursor: pointer;
     }
 
+
+    /* 聊天消息头像 */
+    .msg-av {
+      width: 32px; height: 32px; border-radius: 50%; background: var(--accent);
+      color: #fff; display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; flex-shrink: 0; overflow: hidden;
+    }
+    .msg-av img { width: 100%; height: 100%; object-fit: cover; }
+    .msg-row.me .msg-av { margin-left: 8px; order: 2; }
+    .msg-row.ta .msg-av { margin-right: 8px; }
+    .msg-row { align-items: flex-end; }
+    .chat-room-top .chat-room-nick { cursor: pointer; }
+
+    /* 资料弹窗菜单按钮 */
+    .pv-menu-btn {
+      position: absolute; right: 14px; top: 12px; background: none; border: none;
+      font-size: 20px; color: var(--sub); cursor: pointer; padding: 6px;
+    }
+    .pv-menu-list {
+      position: absolute; right: 14px; top: 46px; background: #fff; border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,.15); overflow: hidden; z-index: 10; min-width: 130px;
+    }
+    .pv-menu-list .mi {
+      padding: 12px 16px; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px;
+    }
+    .pv-menu-list .mi:active { background: var(--bg); }
+    .pv-menu-list .mi.danger { color: #c0392b; }
+    .pv-actions { display: flex; gap: 10px; margin-top: 18px; }
+    .pv-follow-btn {
+      flex: 1; padding: 13px; border-radius: 24px; cursor: pointer; font-size: 15px; font-weight: 600;
+      border: 1px solid var(--accent); background: #fff; color: var(--accent);
+    }
+    .pv-follow-btn.on { background: var(--accent); color: #fff; }
+    .pv-chat-btn { flex: 1; margin-top: 0; }
+
+    /* 举报/拉黑弹窗 */
+    .report-card {
+      background: #fff; border-radius: 18px; padding: 22px; width: 100%; max-width: 340px;
+      max-height: 85vh; overflow-y: auto;
+    }
+    .report-card h3 { font-size: 17px; margin-bottom: 14px; }
+    .report-reason {
+      display: flex; align-items: center; gap: 12px; padding: 12px 0; cursor: pointer;
+      border-bottom: 1px solid #f7f2f4; font-size: 15px;
+    }
+    .report-reason:last-of-type { border-bottom: none; }
+    .report-reason .radio {
+      width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--line); flex-shrink: 0;
+    }
+    .report-reason.on .radio { border-color: var(--accent); background: var(--accent); }
+    .report-detail {
+      width: 100%; margin-top: 12px; padding: 11px 12px; border: 1px solid var(--line);
+      border-radius: 10px; font-size: 14px; outline: none; background: #fdfbfa;
+      font-family: inherit; min-height: 60px; resize: none;
+    }
+    .report-btns { display: flex; gap: 10px; margin-top: 16px; }
+    .report-btns button { flex: 1; padding: 12px; border: none; border-radius: 12px; font-size: 15px; cursor: pointer; }
+    .report-btns .btn-cancel { background: var(--line); color: var(--sub); }
+    .report-btns .btn-confirm { background: #c0392b; color: #fff; }
+    .report-btns .btn-block { background: var(--ink); color: #fff; }
+
     .hidden-input { display:none !important; }
 
     /* 遇见页 */
@@ -745,9 +806,9 @@
   <div id="mainArea" class="hidden">
     <div id="pageHome">
       <div class="tabs">
-        <div class="tab on">推荐</div>
-        <div class="tab">关注</div>
-        <div class="tab">话题</div>
+        <div class="tab on" data-feed="all">推荐</div>
+        <div class="tab" data-feed="follow">关注</div>
+        <div class="tab" data-feed="topic">话题</div>
       </div>
       <div class="feed" id="feedList">
         <div class="empty">加载中...</div>
@@ -780,6 +841,11 @@
     <div class="modal-overlay hidden" id="profileViewModal">
       <div class="pv-card">
         <button class="close" id="pvClose">×</button>
+        <button class="pv-menu-btn" id="pvMenuBtn">⋮</button>
+        <div class="pv-menu-list hidden" id="pvMenuList">
+          <div class="mi" id="pvReportItem">⚠️ 举报该用户</div>
+          <div class="mi danger" id="pvBlockItem">🚫 拉黑该用户</div>
+        </div>
         <div class="pv-head">
           <div class="pv-avatar" id="pvAvatar"></div>
           <div class="pv-basic">
@@ -806,7 +872,10 @@
           <div class="pv-sec-title">兴趣爱好</div>
           <div class="pv-interests" id="pvInterests"></div>
         </div>
-        <button class="pv-chat-btn" id="pvChatBtn">💬 开始聊天</button>
+        <div class="pv-actions">
+          <button class="pv-follow-btn" id="pvFollowBtn">＋ 关注</button>
+          <button class="pv-chat-btn" id="pvChatBtn">💬 开始聊天</button>
+        </div>
       </div>
     </div>
 
@@ -1020,6 +1089,36 @@
         （没收到的话，记得看看垃圾邮件箱）
       </p>
       <button class="submit" style="margin-top:16px;" id="emailConfirmOk">我知道了</button>
+    </div>
+  </div>
+
+  <!-- 举报弹窗 -->
+  <div class="modal-overlay hidden" id="reportModal">
+    <div class="report-card">
+      <h3>举报该用户</h3>
+      <div id="reportReasons"></div>
+      <textarea class="report-detail" id="reportDetail" placeholder="补充说明（选填）"></textarea>
+      <div class="report-btns">
+        <button class="btn-cancel" id="reportCancel">取消</button>
+        <button class="btn-confirm" id="reportSubmit">提交举报</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 拉黑确认弹窗 -->
+  <div class="modal-overlay hidden" id="blockModal">
+    <div class="report-card">
+      <h3>拉黑该用户？</h3>
+      <p style="font-size:14px;color:var(--sub);line-height:1.7;">
+        拉黑后：<br>
+        · 对方无法给你发私信<br>
+        · 你在首页/遇见页看不到对方<br>
+        · 可以随时在设置里解除
+      </p>
+      <div class="report-btns">
+        <button class="btn-cancel" id="blockCancel">取消</button>
+        <button class="btn-block" id="blockConfirm">确认拉黑</button>
+      </div>
     </div>
   </div>
 
@@ -1368,9 +1467,12 @@
       renderVipEntry();
     }
 
-    async function loadPosts() {
+    async function loadPosts(onlyUserIds) {
       try {
-        const posts = await fetchPosts();
+        let posts = await fetchPosts();
+      if (onlyUserIds && onlyUserIds.length) {
+        posts = posts.filter(p => onlyUserIds.includes(p.user_id));
+      }
         const userIds = [...new Set(posts.map(p => p.user_id).filter(Boolean))];
         const profileMap = await fetchProfiles(userIds);
         const feedList = $("feedList");
@@ -2220,7 +2322,8 @@
     async function loadDiscover() {
       try {
         const data = await apiCall("/rest/v1/profiles?select=*&order=updated_at.desc&limit=100");
-        discoverUsers = data.filter(u => u.id !== currentUser?.id);
+        const blocked = await getBlockedIds();
+        discoverUsers = data.filter(u => u.id !== currentUser?.id && !blocked.includes(u.id));
         renderDiscover();
       } catch (e) {
         $("userGrid").innerHTML = `<div class="empty" style="grid-column:1/-1;">加载失败：${escapeHtml(e.message)}</div>`;
@@ -2603,17 +2706,16 @@
       }
     }
 
-    async function openChatRoom(uid, nick) {
-      currentChatUser = { id: uid, nickname: nick };
+    async function openChatRoom(uid, nick, profile) {
+      currentChatUser = { id: uid, nickname: nick, profile: profile || null };
       $("chatRoomNick").textContent = nick;
+      $("chatRoomNick").onclick = () => openProfileView(profile || { id: uid, nickname: nick });
       $("chatRoom").classList.remove("hidden");
       $("chatMessages").innerHTML = '<div class="empty">加载中...</div>';
       await loadChatMessages(true);
       await markChatRead(uid);
-      // 启动轮询
       if (chatPollTimer) clearInterval(chatPollTimer);
       chatPollTimer = setInterval(() => loadChatMessages(false), 2500);
-      // 刷新会话列表未读数
       refreshChatList();
     }
 
@@ -2636,9 +2738,20 @@
         el.innerHTML = '<div class="empty">打个招呼吧～</div>';
         return;
       }
+      const myNick = currentProfile?.nickname || "我";
+      const myAvatarHtml = currentProfile?.avatar_url
+        ? '<img src="' + currentProfile.avatar_url + '">'
+        : myNick.charAt(0).toUpperCase();
+      const taNick = currentChatUser?.nickname || "TA";
+      const taProfile = currentChatUser?.profile;
+      const taAvatarHtml = taProfile?.avatar_url
+        ? '<img src="' + taProfile.avatar_url + '">'
+        : taNick.charAt(0).toUpperCase();
       el.innerHTML = msgs.map(m => {
         const isMe = m.sender_id === currentUser.id;
+        const av = isMe ? myAvatarHtml : taAvatarHtml;
         return '<div class="msg-row ' + (isMe ? "me" : "ta") + '">' +
+          '<div class="msg-av">' + av + '</div>' +
           '<div class="msg-bubble ' + (isMe ? "me" : "ta") + '">' + escapeHtml(m.content) + '</div>' +
           '</div>';
       }).join("");
@@ -2663,6 +2776,10 @@
       const input = $("chatInput");
       const content = input.value.trim();
       if (!content || !currentChatUser) return;
+      if (await isBlockedBy(currentChatUser.id)) {
+        alert("对方已把你拉黑，无法发送消息");
+        return;
+      }
       input.value = "";
       try {
         await apiCall("/rest/v1/messages", "POST", {
@@ -2694,13 +2811,139 @@
     openProfileView = function(u) {
       pvCurrentUser = u;
       origOpenProfileView(u);
-    };
+      const isSelf = currentUser && u.id === currentUser.id;
+      $("pvMenuBtn").style.display = isSelf ? "none" : "block";
+      $("pvActions").style.display = isSelf ? "none" : "flex";
+      if (!isSelf) refreshFollowBtn(u.id);
+    };;
     $("pvChatBtn").onclick = () => {
       if (pvCurrentUser) {
         $("profileViewModal").classList.add("hidden");
-        openChatRoom(pvCurrentUser.id, pvCurrentUser.nickname || "匿名");
+        openChatRoom(pvCurrentUser.id, pvCurrentUser.nickname || "匿名", pvCurrentUser);
       }
     };
+
+    // ===== 关注/举报/拉黑 =====
+    const REPORT_REASONS = ["广告骚扰","虚假信息","不当言论","冒充他人","色情低俗","其他"];
+    let reportReasonIdx = 0;
+    let blockTarget = null;
+
+    async function checkFollowing(targetId) {
+      const data = await apiCall("/rest/v1/follows?follower_id=eq." + currentUser.id + "&following_id=eq." + targetId + "&limit=1");
+      return data && data.length > 0;
+    }
+    async function toggleFollow(targetId) {
+      const isF = await checkFollowing(targetId);
+      if (isF) {
+        await apiCall("/rest/v1/follows?follower_id=eq." + currentUser.id + "&following_id=eq." + targetId, "DELETE");
+        return false;
+      } else {
+        await apiCall("/rest/v1/follows", "POST", { follower_id: currentUser.id, following_id: targetId });
+        return true;
+      }
+    }
+    async function getBlockedIds() {
+      const data = await apiCall("/rest/v1/blocks?blocker_id=eq." + currentUser.id + "&limit=100");
+      return (data || []).map(b => b.blocked_id);
+    }
+    async function isBlockedBy(targetId) {
+      const data = await apiCall("/rest/v1/blocks?blocker_id=eq." + targetId + "&blocked_id=eq." + currentUser.id + "&limit=1");
+      return data && data.length > 0;
+    }
+    async function getFollowingIds() {
+      const data = await apiCall("/rest/v1/follows?follower_id=eq." + currentUser.id + "&limit=100");
+      return (data || []).map(f => f.following_id);
+    }
+
+    async function refreshFollowBtn(targetId) {
+      const isF = await checkFollowing(targetId);
+      const btn = $("pvFollowBtn");
+      btn.classList.toggle("on", isF);
+      btn.textContent = isF ? "✓ 已关注" : "＋ 关注";
+    }
+
+    $("pvMenuBtn").onclick = (e) => {
+      e.stopPropagation();
+      $("pvMenuList").classList.toggle("hidden");
+    };
+    document.addEventListener("click", () => {
+      if ($("pvMenuList")) $("pvMenuList").classList.add("hidden");
+    });
+
+    function renderReportReasons() {
+      $("reportReasons").innerHTML = REPORT_REASONS.map((r, i) =>
+        '<div class="report-reason ' + (i === reportReasonIdx ? "on" : "") + '" data-i="' + i + '">' +
+        '<span class="radio"></span>' + r + '</div>'
+      ).join("");
+      $("reportReasons").querySelectorAll(".report-reason").forEach(el => {
+        el.onclick = () => { reportReasonIdx = parseInt(el.dataset.i); renderReportReasons(); };
+      });
+    }
+    $("pvReportItem").onclick = () => {
+      $("pvMenuList").classList.add("hidden");
+      reportReasonIdx = 0;
+      $("reportDetail").value = "";
+      renderReportReasons();
+      $("reportModal").classList.remove("hidden");
+    };
+    $("reportCancel").onclick = () => $("reportModal").classList.add("hidden");
+    $("reportSubmit").onclick = async () => {
+      if (!pvCurrentUser) return;
+      try {
+        await apiCall("/rest/v1/reports", "POST", {
+          reporter_id: currentUser.id,
+          reported_id: pvCurrentUser.id,
+          reason: REPORT_REASONS[reportReasonIdx],
+          detail: $("reportDetail").value.trim()
+        });
+        $("reportModal").classList.add("hidden");
+        alert("已收到你的举报，我们会尽快处理");
+      } catch (e) { alert("提交失败：" + e.message); }
+    };
+
+    $("pvBlockItem").onclick = () => {
+      $("pvMenuList").classList.add("hidden");
+      blockTarget = pvCurrentUser;
+      $("blockModal").classList.remove("hidden");
+    };
+    $("blockCancel").onclick = () => $("blockModal").classList.add("hidden");
+    $("blockConfirm").onclick = async () => {
+      if (!blockTarget) return;
+      try {
+        await apiCall("/rest/v1/blocks", "POST", { blocker_id: currentUser.id, blocked_id: blockTarget.id });
+        $("blockModal").classList.add("hidden");
+        $("profileViewModal").classList.add("hidden");
+        alert("已拉黑该用户");
+        loadDiscover();
+        refreshChatList();
+      } catch (e) { alert("操作失败：" + e.message); }
+    };
+
+    $("pvFollowBtn").onclick = async () => {
+      if (!pvCurrentUser) return;
+      const nowF = await toggleFollow(pvCurrentUser.id);
+      await refreshFollowBtn(pvCurrentUser.id);
+      if (nowF) alert("已关注该用户");
+    };
+
+    // 首页推荐/关注/话题切换
+    document.querySelectorAll("#pageHome .tabs .tab").forEach(tab => {
+      tab.onclick = async () => {
+        document.querySelectorAll("#pageHome .tabs .tab").forEach(t => t.classList.remove("on"));
+        tab.classList.add("on");
+        const feed = tab.dataset.feed;
+        if (feed === "follow") {
+          const ids = await getFollowingIds();
+          if (ids.length === 0) {
+            $("feedList").innerHTML = '<div class="empty">你还没关注任何人，去遇见页认识新朋友吧～</div>';
+            return;
+          }
+          await loadPosts(ids);
+        } else {
+          await loadPosts();
+        }
+      };
+    });
 
     async function handleAuthCallback() {
       const params = new URLSearchParams(location.search);
