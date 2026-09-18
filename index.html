@@ -481,6 +481,15 @@
     }
     .pv-follow-btn.on { background: var(--accent); color: #fff; }
     .pv-chat-btn { flex: 1; margin-top: 0; }
+    .pv-danger-actions { display: flex; gap: 10px; margin-top: 12px; }
+    .pv-report-btn {
+      flex: 1; padding: 11px; border-radius: 20px; cursor: pointer; font-size: 13px;
+      border: 1px solid var(--line); background: #fff; color: var(--sub);
+    }
+    .pv-block-btn {
+      flex: 1; padding: 11px; border-radius: 20px; cursor: pointer; font-size: 13px;
+      border: 1px solid #f3d3d3; background: #fdf3f3; color: #c0392b;
+    }
 
     /* 举报/拉黑弹窗 */
     .report-card {
@@ -841,11 +850,6 @@
     <div class="modal-overlay hidden" id="profileViewModal">
       <div class="pv-card">
         <button class="close" id="pvClose">×</button>
-        <button class="pv-menu-btn" id="pvMenuBtn">⋮</button>
-        <div class="pv-menu-list hidden" id="pvMenuList">
-          <div class="mi" id="pvReportItem">⚠️ 举报该用户</div>
-          <div class="mi danger" id="pvBlockItem">🚫 拉黑该用户</div>
-        </div>
         <div class="pv-head">
           <div class="pv-avatar" id="pvAvatar"></div>
           <div class="pv-basic">
@@ -875,6 +879,10 @@
         <div class="pv-actions">
           <button class="pv-follow-btn" id="pvFollowBtn">＋ 关注</button>
           <button class="pv-chat-btn" id="pvChatBtn">💬 开始聊天</button>
+        </div>
+        <div class="pv-danger-actions">
+          <button class="pv-report-btn" id="pvReportBtn">⚠️ 举报该用户</button>
+          <button class="pv-block-btn" id="pvBlockBtn">🚫 拉黑该用户</button>
         </div>
       </div>
     </div>
@@ -2769,6 +2777,11 @@
           '<div class="msg-bubble ' + (isMe ? "me" : "ta") + '">' + escapeHtml(m.content) + '</div>' +
           '</div>';
       }).join("");
+      // 对方头像可点击，进入资料页
+      el.querySelectorAll(".msg-row.ta .msg-av").forEach(av => {
+        av.style.cursor = "pointer";
+        av.onclick = () => openProfileView(currentChatUser.profile || { id: currentChatUser.id, nickname: currentChatUser.nickname });
+      });
     }
 
     function scrollChatToBottom() {
