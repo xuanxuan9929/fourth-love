@@ -2708,8 +2708,22 @@
 
     async function openChatRoom(uid, nick, profile) {
       currentChatUser = { id: uid, nickname: nick, profile: profile || null };
-      $("chatRoomNick").textContent = nick;
-      $("chatRoomNick").onclick = () => openProfileView(profile || { id: uid, nickname: nick });
+      // 没有对方资料时，查询最新资料（保证头像同步）
+      if (!currentChatUser.profile) {
+        try {
+          const p = await getProfile(uid);
+          if (p) {
+            currentChatUser.profile = p;
+            if (p.nickname) {
+              currentChatUser.nickname = p.nickname;
+              $("chatRoomNick").textContent = p.nickname;
+            }
+          }
+        } catch (e) { /* 静默 */ }
+      } else {
+        $("chatRoomNick").textContent = nick;
+      }
+      $("chatRoomNick").onclick = () => openProfileView(currentChatUser.profile || { id: uid, nickname: nick });
       $("chatRoom").classList.remove("hidden");
       $("chatMessages").innerHTML = '<div class="empty">加载中...</div>';
       await loadChatMessages(true);
