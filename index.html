@@ -1149,6 +1149,11 @@
       else localStorage.removeItem(STORAGE_KEY);
     }
 
+    async function checkEmailExists(email) {
+      const data = await apiCall("/rest/v1/rpc/check_email_registered", "POST", { check_email: email });
+      return data === true;
+    }
+
     async function signUp(email, password, nickname) {
       const data = await apiCall("/auth/v1/signup", "POST", { email, password, data: { nickname } });
       if (data.access_token) setStoredSession(data);
@@ -1409,6 +1414,12 @@
       setMsg(authMode === "login" ? "登录中…" : "注册中…");
       try {
         if (authMode === "signup") {
+          // 先检查邮箱是否已注册
+          const exists = await checkEmailExists(email);
+          if (exists) {
+            setMsg("该邮箱已被注册，请直接登录", "err");
+            return;
+          }
           if (!regGender) {
             setMsg("注册请选性别", "err");
             return;
