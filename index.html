@@ -1365,7 +1365,7 @@
         const body = $("pickerBody");
         const old = body.querySelectorAll(".picker-col")[2];
         body.replaceChild(newCol, old);
-        cols[2] = newCol;
+        // 注意：不要写 cols[2] = newCol，buildPickerCol 内部已更新 cols[2].scroller
       };
       cols[0].onChange = i => { cols[0].selected = i; rebuildDay(); };
       cols[1].onChange = i => { cols[1].selected = i; rebuildDay(); };
@@ -1614,7 +1614,7 @@
         const body = $("pickerBody");
         const old = body.querySelectorAll(".picker-col")[2];
         body.replaceChild(newCol, old);
-        cols[2] = newCol;
+        // 注意：不要写 cols[2] = newCol，buildPickerCol 内部已更新 cols[2].scroller
       };
       cols[0].onChange = i => { cols[0].selected = i; rebuildDay(); };
       cols[1].onChange = i => { cols[1].selected = i; rebuildDay(); };
