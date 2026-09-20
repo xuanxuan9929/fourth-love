@@ -517,6 +517,36 @@
     .report-btns .btn-confirm { background: #c0392b; color: #fff; }
     .report-btns .btn-block { background: var(--ink); color: #fff; }
 
+
+    /* 点赞/评论 */
+    .post .actions .like-btn, .post .actions .comment-btn { cursor: pointer; user-select: none; transition: transform .12s; }
+    .post .actions .like-btn:active, .post .actions .comment-btn:active { transform: scale(1.15); }
+    .post .actions .like-btn.liked { color: #d4758c; }
+    .comment-section { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 12px; }
+    .comment-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; max-height: 300px; overflow-y: auto; }
+    .comment-item { display: flex; gap: 10px; }
+    .comment-item .c-av {
+      width: 30px; height: 30px; border-radius: 50%; background: var(--accent);
+      color: #fff; display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; flex-shrink: 0; overflow: hidden;
+    }
+    .comment-item .c-av img { width: 100%; height: 100%; object-fit: cover; }
+    .comment-item .c-body { flex: 1; min-width: 0; background: var(--bg); border-radius: 12px; padding: 8px 12px; }
+    .comment-item .c-name { font-size: 12px; font-weight: 600; color: var(--accent); }
+    .comment-item .c-text { font-size: 14px; line-height: 1.5; margin-top: 2px; word-break: break-word; }
+    .comment-item .c-time { font-size: 11px; color: var(--sub); margin-top: 4px; }
+    .comment-input-bar { display: flex; gap: 8px; }
+    .comment-input-bar input {
+      flex: 1; padding: 9px 12px; border: 1px solid var(--line); border-radius: 18px;
+      font-size: 14px; outline: none; background: #fdfbfa;
+    }
+    .comment-input-bar button {
+      padding: 0 18px; border: none; border-radius: 18px;
+      background: linear-gradient(90deg, #d4758c, #a06ee0); color: #fff;
+      font-size: 14px; cursor: pointer;
+    }
+    .empty-comment { text-align: center; color: var(--sub); font-size: 13px; padding: 16px 0; }
+
     .hidden-input { display:none !important; }
 
     /* 遇见页 */
@@ -1478,12 +1508,29 @@
       renderVipEntry();
     }
 
+    let postLikesMap = {};
+    let postCommentsMap = {};
+    let myLikedIds = new Set();
+
     async function loadPosts(onlyUserIds) {
       try {
         let posts = await fetchPosts();
       if (onlyUserIds && onlyUserIds.length) {
         posts = posts.filter(p => onlyUserIds.includes(p.user_id));
       }
+        // 获取点赞和评论数据
+        const allLikes = await apiCall("/rest/v1/likes?select=post_id,user_id&limit=1000");
+        const allComments = await apiCall("/rest/v1/comments?select=post_id&limit=2000");
+        postLikesMap = {};
+        postCommentsMap = {};
+        myLikedIds = new Set();
+        (allLikes || []).forEach(l => {
+          postLikesMap[l.post_id] = (postLikesMap[l.post_id] || 0) + 1;
+          if (l.user_id === currentUser.id) myLikedIds.add(l.post_id);
+        });
+        (allComments || []).forEach(c => {
+          postCommentsMap[c.post_id] = (postCommentsMap[c.post_id] || 0) + 1;
+        });
         const userIds = [...new Set(posts.map(p => p.user_id).filter(Boolean))];
         const profileMap = await fetchProfiles(userIds);
         const feedList = $("feedList");
@@ -1499,6 +1546,13 @@
             month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit"
           });
           const tagsHtml = (post.tags || []).map(tag => `<span class="tag"># ${tag}</span>`).join("");
+        // 绑定点赞/评论事件
+        feedList.querySelectorAll(".like-btn").forEach(btn => {
+          btn.onclick = () => toggleLike(parseInt(btn.dataset.postId));
+        });
+        feedList.querySelectorAll(".comment-btn").forEach(btn => {
+          btn.onclick = () => toggleComments(parseInt(btn.dataset.postId));
+        });
           const avatarHtml = profile.avatar_url
             ? `<img src="${profile.avatar_url}">`
             : nick.charAt(0).toUpperCase();
@@ -1514,10 +1568,11 @@
               <div class="content">${escapeHtml(post.content)}</div>
               <div class="tags">${tagsHtml}</div>
               <div class="actions">
-                <span>♥ 0</span>
-                <span>💬 0</span>
+                <span class="like-btn ${myLikedIds.has(post.id) ? "liked" : ""}" data-post-id="${post.id}">${myLikedIds.has(post.id) ? "♥" : "♡"} ${postLikesMap[post.id] || 0}</span>
+                <span class="comment-btn" data-post-id="${post.id}">💬 ${postCommentsMap[post.id] || 0}</span>
                 <span>↗ 分享</span>
               </div>
+              <div class="comment-section hidden" id="comments-${post.id}"></div>
             </div>
           `;
         }).join("");
@@ -2963,6 +3018,98 @@
         }
       };
     });
+
+    // ===== 点赞/评论 =====
+    async function toggleLike(postId) {
+      const liked = myLikedIds.has(postId);
+      try {
+        if (liked) {
+          await apiCall("/rest/v1/likes?post_id=eq." + postId + "&user_id=eq." + currentUser.id, "DELETE");
+          myLikedIds.delete(postId);
+          postLikesMap[postId] = Math.max(0, (postLikesMap[postId] || 1) - 1);
+        } else {
+          await apiCall("/rest/v1/likes", "POST", { post_id: postId, user_id: currentUser.id });
+          myLikedIds.add(postId);
+          postLikesMap[postId] = (postLikesMap[postId] || 0) + 1;
+        }
+        document.querySelectorAll('.like-btn[data-post-id="' + postId + '"]').forEach(btn => {
+          const nowLiked = myLikedIds.has(postId);
+          btn.classList.toggle("liked", nowLiked);
+          btn.textContent = (nowLiked ? "♥" : "♡") + " " + (postLikesMap[postId] || 0);
+        });
+      } catch (e) { console.error(e); }
+    }
+
+    async function toggleComments(postId) {
+      const section = $("comments-" + postId);
+      if (section.classList.contains("hidden")) {
+        section.classList.remove("hidden");
+        await loadComments(postId);
+      } else {
+        section.classList.add("hidden");
+      }
+    }
+
+    async function loadComments(postId) {
+      const section = $("comments-" + postId);
+      section.innerHTML = '<div class="empty-comment">加载评论中...</div>';
+      try {
+        const comments = await apiCall("/rest/v1/comments?post_id=eq." + postId + "&order=created_at.asc&limit=50");
+        const userIds = [...new Set((comments || []).map(c => c.user_id))];
+        let profileMap = {};
+        if (userIds.length) {
+          const profiles = await apiCall("/rest/v1/profiles?id=in.(" + userIds.join(",") + ")");
+          (profiles || []).forEach(p => { profileMap[p.id] = p; });
+        }
+        renderComments(postId, comments || [], profileMap);
+      } catch (e) {
+        section.innerHTML = '<div class="empty-comment">加载失败：' + escapeHtml(e.message) + '</div>';
+      }
+    }
+
+    function renderComments(postId, comments, profileMap) {
+      const section = $("comments-" + postId);
+      const listHtml = comments.length
+        ? '<div class="comment-list">' + comments.map(c => {
+            const p = profileMap[c.user_id] || {};
+            const nick = p.nickname || "匿名";
+            const av = p.avatar_url ? '<img src="' + p.avatar_url + '">' : nick.charAt(0).toUpperCase();
+            return '<div class="comment-item">' +
+              '<div class="c-av">' + av + '</div>' +
+              '<div class="c-body">' +
+              '<div class="c-name">' + escapeHtml(nick) + '</div>' +
+              '<div class="c-text">' + escapeHtml(c.content) + '</div>' +
+              '<div class="c-time">' + formatMsgTime(c.created_at) + '</div>' +
+              '</div></div>';
+          }).join("") + '</div>'
+        : '<div class="empty-comment">还没有评论，来抢沙发～</div>';
+      section.innerHTML = listHtml +
+        '<div class="comment-input-bar">' +
+        '<input type="text" id="commentInput-' + postId + '" placeholder="说点什么..." maxlength="200">' +
+        '<button onclick="sendComment(' + postId + ')">发送</button>' +
+        '</div>';
+      const input = $("commentInput-" + postId);
+      if (input) input.addEventListener("keydown", (e) => { if (e.key === "Enter") sendComment(postId); });
+    }
+
+    async function sendComment(postId) {
+      const input = $("commentInput-" + postId);
+      const content = input.value.trim();
+      if (!content) return;
+      input.value = "";
+      try {
+        await apiCall("/rest/v1/comments", "POST", {
+          post_id: postId, user_id: currentUser.id, content
+        });
+        postCommentsMap[postId] = (postCommentsMap[postId] || 0) + 1;
+        document.querySelectorAll('.comment-btn[data-post-id="' + postId + '"]').forEach(btn => {
+          btn.textContent = "💬 " + postCommentsMap[postId];
+        });
+        await loadComments(postId);
+      } catch (e) {
+        alert("评论失败：" + e.message);
+      }
+    }
 
     async function handleAuthCallback() {
       const params = new URLSearchParams(location.search);
