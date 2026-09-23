@@ -547,6 +547,44 @@
     }
     .empty-comment { text-align: center; color: var(--sub); font-size: 13px; padding: 16px 0; }
 
+    /* 通知 */
+    .notif-bell { position: relative; cursor: pointer; font-size: 20px; padding: 4px; }
+    .notif-badge {
+      position: absolute; top: -2px; right: -4px; min-width: 16px; height: 16px;
+      border-radius: 8px; background: #d4758c; color: #fff; font-size: 10px;
+      display: flex; align-items: center; justify-content: center; padding: 0 4px; font-weight: 600;
+    }
+    .notif-card {
+      background: #fff; border-radius: 18px 18px 0 0; width: 100%; max-width: 500px;
+      max-height: 75vh; display: flex; flex-direction: column; position: absolute; bottom: 0;
+    }
+    .notif-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 18px; border-bottom: 1px solid var(--line);
+    }
+    .notif-header h3 { font-size: 17px; }
+    .notif-header .close { background: none; border: none; font-size: 24px; color: var(--sub); cursor: pointer; }
+    .notif-list { flex: 1; overflow-y: auto; }
+    .notif-item {
+      display: flex; align-items: center; gap: 12px; padding: 13px 18px;
+      border-bottom: 1px solid #f7f2f4; cursor: pointer; position: relative;
+    }
+    .notif-item:active { background: var(--bg); }
+    .notif-item .n-av {
+      width: 40px; height: 40px; border-radius: 50%; background: var(--accent);
+      color: #fff; display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 700; flex-shrink: 0; overflow: hidden;
+    }
+    .notif-item .n-av img { width: 100%; height: 100%; object-fit: cover; }
+    .notif-item .n-body { flex: 1; min-width: 0; }
+    .notif-item .n-text { font-size: 14px; line-height: 1.5; }
+    .notif-item .n-text b { color: var(--accent); }
+    .notif-item .n-time { font-size: 12px; color: var(--sub); margin-top: 3px; }
+    .notif-item .n-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: #d4758c; flex-shrink: 0;
+    }
+    .notif-empty { text-align: center; color: var(--sub); padding: 40px 20px; font-size: 14px; }
+
     .hidden-input { display:none !important; }
 
     /* 遇见页 */
@@ -802,6 +840,7 @@
     <div class="logo">第四爱</div>
     <div class="user-info hidden" id="userInfo">
       <span class="nick" id="topNick"></span>
+      <div class="notif-bell" id="notifBell">🔔<span class="notif-badge hidden" id="notifBadge">0</span></div>
       <button class="btn-logout" id="logoutBtn">退出</button>
     </div>
   </div>
@@ -1130,6 +1169,17 @@
         （没收到的话，记得看看垃圾邮件箱）
       </p>
       <button class="submit" style="margin-top:16px;" id="emailConfirmOk">我知道了</button>
+    </div>
+  </div>
+
+  <!-- 通知列表弹窗 -->
+  <div class="modal-overlay hidden" id="notifModal">
+    <div class="notif-card">
+      <div class="notif-header">
+        <h3>通知</h3>
+        <button class="close" id="notifClose">×</button>
+      </div>
+      <div class="notif-list" id="notifList"></div>
     </div>
   </div>
 
@@ -1597,6 +1647,7 @@
       currentProfile = await ensureProfile(user);
       renderProfile();
       loadPosts();
+      startNotifPoll();
     }
 
     function renderUnauthed() {
@@ -2670,6 +2721,9 @@
       const y = a < b ? b : a;
       try {
         await apiCall("/rest/v1/matches", "POST", { user_a: x, user_b: y });
+        // 给双方发配对通知
+        sendNotification(a, "match", null);
+        sendNotification(b, "match", null);
       } catch (e) { /* 已存在则忽略 */ }
     }
 
@@ -2872,6 +2926,7 @@
           receiver_id: currentChatUser.id,
           content
         });
+        sendNotification(currentChatUser.id, "message", null);
         await loadChatMessages(true);
       } catch (e) {
         alert("发送失败：" + e.message);
@@ -2997,7 +3052,10 @@
       if (!pvCurrentUser) return;
       const nowF = await toggleFollow(pvCurrentUser.id);
       await refreshFollowBtn(pvCurrentUser.id);
-      if (nowF) alert("已关注该用户");
+      if (nowF) {
+        sendNotification(pvCurrentUser.id, "follow", null);
+        alert("已关注该用户");
+      }
     };
 
     // 首页推荐/关注/话题切换
@@ -3031,6 +3089,13 @@
           await apiCall("/rest/v1/likes", "POST", { post_id: postId, user_id: currentUser.id });
           myLikedIds.add(postId);
           postLikesMap[postId] = (postLikesMap[postId] || 0) + 1;
+          // 给帖子作者发点赞通知
+          try {
+            const post = await apiCall("/rest/v1/posts?id=eq." + postId + "&select=user_id&limit=1");
+            if (post && post.length && post[0].user_id !== currentUser.id) {
+              sendNotification(post[0].user_id, "like", postId);
+            }
+          } catch (e) { /* 静默 */ }
         }
         document.querySelectorAll('.like-btn[data-post-id="' + postId + '"]').forEach(btn => {
           const nowLiked = myLikedIds.has(postId);
@@ -3101,6 +3166,13 @@
         await apiCall("/rest/v1/comments", "POST", {
           post_id: postId, user_id: currentUser.id, content
         });
+        // 给帖子作者发评论通知
+        try {
+          const post = await apiCall("/rest/v1/posts?id=eq." + postId + "&select=user_id&limit=1");
+          if (post && post.length && post[0].user_id !== currentUser.id) {
+            sendNotification(post[0].user_id, "comment", postId);
+          }
+        } catch (e) { /* 静默 */ }
         postCommentsMap[postId] = (postCommentsMap[postId] || 0) + 1;
         document.querySelectorAll('.comment-btn[data-post-id="' + postId + '"]').forEach(btn => {
           btn.textContent = "💬 " + postCommentsMap[postId];
@@ -3110,6 +3182,113 @@
         alert("评论失败：" + e.message);
       }
     }
+
+    // ===== 通知系统 =====
+    let notifPollTimer = null;
+
+    async function sendNotification(userId, type, relatedId) {
+      if (!userId || userId === currentUser.id) return;
+      try {
+        await apiCall("/rest/v1/notifications", "POST", {
+          user_id: userId,
+          type: type,
+          from_user_id: currentUser.id,
+          related_id: relatedId || null
+        });
+      } catch (e) { /* 静默 */ }
+    }
+
+    async function loadUnreadCount() {
+      try {
+        const data = await apiCall("/rest/v1/notifications?user_id=eq." + currentUser.id + "&read=eq.false&select=id");
+        const count = (data || []).length;
+        const badge = $("notifBadge");
+        if (count > 0) {
+          badge.textContent = count > 99 ? "99+" : count;
+          badge.classList.remove("hidden");
+        } else {
+          badge.classList.add("hidden");
+        }
+      } catch (e) { /* 静默 */ }
+    }
+
+    function startNotifPoll() {
+      loadUnreadCount();
+      if (notifPollTimer) clearInterval(notifPollTimer);
+      notifPollTimer = setInterval(loadUnreadCount, 8000);
+    }
+
+    async function loadNotifications() {
+      try {
+        const data = await apiCall("/rest/v1/notifications?user_id=eq." + currentUser.id + "&order=created_at.desc&limit=50");
+        const fromIds = [...new Set((data || []).map(n => n.from_user_id).filter(Boolean))];
+        let profileMap = {};
+        if (fromIds.length) {
+          const profiles = await apiCall("/rest/v1/profiles?id=in.(" + fromIds.join(",") + ")");
+          (profiles || []).forEach(p => { profileMap[p.id] = p; });
+        }
+        renderNotifications(data || [], profileMap);
+      } catch (e) {
+        $("notifList").innerHTML = '<div class="notif-empty">加载失败：' + escapeHtml(e.message) + '</div>';
+      }
+    }
+
+    function renderNotifications(notifs, profileMap) {
+      const el = $("notifList");
+      if (!notifs.length) {
+        el.innerHTML = '<div class="notif-empty">还没有通知</div>';
+        return;
+      }
+      const typeText = {
+        follow: "关注了你",
+        message: "给你发了私信",
+        match: "和你配对成功了",
+        comment: "评论了你的帖子",
+        like: "赞了你的帖子"
+      };
+      el.innerHTML = notifs.map(n => {
+        const from = profileMap[n.from_user_id] || {};
+        const fromNick = from.nickname || "有人";
+        const av = from.avatar_url ? '<img src="' + from.avatar_url + '">' : fromNick.charAt(0).toUpperCase();
+        return '<div class="notif-item" data-type="' + n.type + '" data-from="' + (n.from_user_id || "") + '" data-related="' + (n.related_id || "") + '" data-id="' + n.id + '">' +
+          '<div class="n-av">' + av + '</div>' +
+          '<div class="n-body">' +
+          '<div class="n-text"><b>' + escapeHtml(fromNick) + '</b> ' + (typeText[n.type] || n.type) + '</div>' +
+          '<div class="n-time">' + formatMsgTime(n.created_at) + '</div>' +
+          '</div>' +
+          (n.read ? '' : '<div class="n-dot"></div>') +
+          '</div>';
+      }).join("");
+      // 点通知跳转 + 标记已读
+      el.querySelectorAll(".notif-item").forEach(item => {
+        item.onclick = async () => {
+          const nid = item.dataset.id;
+          const type = item.dataset.type;
+          const fromId = item.dataset.from;
+          const relatedId = item.dataset.related;
+          // 标记已读
+          apiCall("/rest/v1/notifications?id=eq." + nid, "PATCH", { read: true }).catch(() => {});
+          loadUnreadCount();
+          $("notifModal").classList.add("hidden");
+          // 跳转
+          if (type === "message" && fromId) {
+            const from = profileMap[fromId] || { id: fromId, nickname: "对方" };
+            openChatRoom(fromId, from.nickname || "对方", from);
+          } else if (type === "follow" || type === "match") {
+            if (fromId && profileMap[fromId]) openProfileView(profileMap[fromId]);
+          } else if ((type === "comment" || type === "like") && relatedId) {
+            // 跳到首页并滚动到该帖子（简化：切到首页）
+            document.querySelector('[data-page="home"]')?.click();
+          }
+        };
+      });
+    }
+
+    $("notifBell").onclick = () => {
+      $("notifModal").classList.remove("hidden");
+      loadNotifications();
+    };
+    $("notifClose").onclick = () => $("notifModal").classList.add("hidden");
 
     async function handleAuthCallback() {
       const params = new URLSearchParams(location.search);
