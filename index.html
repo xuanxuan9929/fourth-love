@@ -546,6 +546,18 @@
       font-size: 14px; cursor: pointer;
     }
     .empty-comment { text-align: center; color: var(--sub); font-size: 13px; padding: 16px 0; }
+    .post-images-pick { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .post-img-cell { position: relative; width: 72px; height: 72px; border-radius: 8px; overflow: hidden; }
+    .post-img-cell img { width: 100%; height: 100%; object-fit: cover; }
+    .post-img-cell .del { position: absolute; top: 2px; right: 2px; width: 18px; height: 18px; border-radius: 50%; background: rgba(0,0,0,.55); color: #fff; border: none; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .post-img-add { width: 72px; height: 72px; border-radius: 8px; border: 2px dashed #eccbd3; background: var(--accent-light); display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--accent); cursor: pointer; }
+    .post-images-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 10px; }
+    .post-images-grid.one { grid-template-columns: 1fr; }
+    .post-images-grid.two { grid-template-columns: 1fr 1fr; }
+    .post-images-grid img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; cursor: pointer; display: block; }
+    .post-images-grid.one img { aspect-ratio: auto; max-height: 360px; }
+    .img-viewer { position: fixed; inset: 0; background: rgba(0,0,0,.92); z-index: 400; display: flex; align-items: center; justify-content: center; }
+    .img-viewer img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
     /* 通知 */
     .notif-bell { position: relative; cursor: pointer; font-size: 20px; padding: 4px; }
@@ -1018,6 +1030,11 @@
         <textarea id="postContent" rows="6" placeholder="分享你的故事、想法..."></textarea>
       </div>
       <div class="field">
+        <label>添加图片（最多9张）</label>
+        <div class="post-images-pick" id="postImagesPick"></div>
+        <input type="file" id="postImageFile" accept="image/*" multiple class="hidden-input">
+      </div>
+      <div class="field">
         <label>选择话题标签（可多选）</label>
         <div class="tag-selector" id="tagSelector">
           <div class="tag-opt" data-tag="关系讨论">关系讨论</div>
@@ -1171,6 +1188,8 @@
       <button class="submit" style="margin-top:16px;" id="emailConfirmOk">我知道了</button>
     </div>
   </div>
+
+  <div class="img-viewer hidden" id="imgViewer"><img id="imgViewerImg" alt=""></div>
 
   <!-- 通知列表弹窗 -->
   <div class="modal-overlay hidden" id="notifModal">
@@ -1367,6 +1386,7 @@
     let currentUser = null;
     let currentProfile = null;
     let selectedTags = [];
+    let postImages = [];
 
     async function apiCall(endpoint, method = "GET", body = null) {
       const headers = {
@@ -1489,9 +1509,9 @@
       const data = await apiCall("/rest/v1/posts?order=created_at.desc&limit=30");
       return data;
     }
-    async function createPost(content, tags) {
+    async function createPost(content, tags, images) {
       const data = await apiCall("/rest/v1/posts", "POST", {
-        user_id: currentUser.id, content, tags
+        user_id: currentUser.id, content, tags, images: images || []
       });
       return data;
     }
@@ -1597,6 +1617,7 @@
           });
           const tagsHtml = (post.tags || []).map(tag => `<span class="tag"># ${tag}</span>`).join("");
         // 绑定点赞/评论事件
+        feedList.querySelectorAll(".post-images-grid img").forEach(img => { img.onclick = () => openImgViewer(img.src); });
         feedList.querySelectorAll(".like-btn").forEach(btn => {
           btn.onclick = () => toggleLike(parseInt(btn.dataset.postId));
         });
@@ -1616,6 +1637,7 @@
                 </div>
               </div>
               <div class="content">${escapeHtml(post.content)}</div>
+              ${(post.images && post.images.length) ? '<div class="post-images-grid ' + (post.images.length === 1 ? "one" : post.images.length === 2 ? "two" : "") + '">' + post.images.map(im => '<img src="' + im + '">').join("") + '</div>' : ""}
               <div class="tags">${tagsHtml}</div>
               <div class="actions">
                 <span class="like-btn ${myLikedIds.has(post.id) ? "liked" : ""}" data-post-id="${post.id}">${myLikedIds.has(post.id) ? "♥" : "♡"} ${postLikesMap[post.id] || 0}</span>
@@ -1782,10 +1804,35 @@
       $("publishModal").classList.remove("hidden");
       $("postContent").value = "";
       selectedTags = [];
+      postImages = [];
+      renderPostImages();
       document.querySelectorAll(".tag-opt").forEach(t => t.classList.remove("selected"));
       $("publishMsg").textContent = "";
     };
     $("closePublish").onclick = () => $("publishModal").classList.add("hidden");
+
+    function renderPostImages() {
+      const el = $("postImagesPick");
+      let h = postImages.map((src, i) => '<div class="post-img-cell"><img src="' + src + '"><button class="del" data-i="' + i + '">×</button></div>').join("");
+      if (postImages.length < 9) h += '<div class="post-img-add" id="postImgAdd">＋</div>';
+      el.innerHTML = h;
+      el.querySelectorAll(".del").forEach(b => { b.onclick = () => { postImages.splice(parseInt(b.dataset.i), 1); renderPostImages(); }; });
+      const add = $("postImgAdd");
+      if (add) add.onclick = () => $("postImageFile").click();
+    }
+    $("postImageFile").onchange = async (e) => {
+      const files = [...e.target.files];
+      $("postImageFile").value = "";
+      const room = 9 - postImages.length;
+      if (room <= 0) { alert("最多9张图片"); return; }
+      try {
+        for (const f of files.slice(0, room)) postImages.push(await compressAvatar(f, 720));
+        renderPostImages();
+      } catch (err) { alert("图片处理失败"); }
+    };
+    $("imgViewer").onclick = () => $("imgViewer").classList.add("hidden");
+    function openImgViewer(src) { $("imgViewerImg").src = src; $("imgViewer").classList.remove("hidden"); }
+    renderPostImages();
 
     document.querySelectorAll(".tag-opt").forEach(opt => {
       opt.onclick = () => {
@@ -1810,7 +1857,7 @@
       $("publishMsg").textContent = "发布中...";
       $("publishMsg").className = "msg";
       try {
-        await createPost(content, selectedTags);
+        await createPost(content, selectedTags, postImages);
         $("publishMsg").textContent = "发布成功！";
         $("publishMsg").className = "msg ok";
         setTimeout(() => {
