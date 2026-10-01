@@ -554,7 +554,7 @@
     .post-images-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 10px; }
     .post-images-grid.one { grid-template-columns: 1fr; }
     .post-images-grid.two { grid-template-columns: 1fr 1fr; }
-    .post-images-grid img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; cursor: pointer; display: block; }
+    .post-images-grid img { position: relative; z-index: 2; pointer-events: auto; width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; cursor: pointer; display: block; }
     .post-images-grid.one img { aspect-ratio: auto; max-height: 360px; }
     .img-viewer { position: fixed; inset: 0; background: rgba(0,0,0,.92); z-index: 400; display: flex; align-items: center; justify-content: center; }
     .img-viewer img { max-width: 100%; max-height: 100%; object-fit: contain; }
@@ -1189,7 +1189,6 @@
     </div>
   </div>
 
-  <div class="img-viewer hidden" id="imgViewer"><img id="imgViewerImg" alt=""></div>
 
   <!-- 通知列表弹窗 -->
   <div class="modal-overlay hidden" id="notifModal">
@@ -1616,14 +1615,7 @@
             month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit"
           });
           const tagsHtml = (post.tags || []).map(tag => `<span class="tag"># ${tag}</span>`).join("");
-        // 绑定点赞/评论事件
-        feedList.querySelectorAll(".post-images-grid img").forEach(img => { img.onclick = () => openImgViewer(img.src); });
-        feedList.querySelectorAll(".like-btn").forEach(btn => {
-          btn.onclick = () => toggleLike(parseInt(btn.dataset.postId));
-        });
-        feedList.querySelectorAll(".comment-btn").forEach(btn => {
-          btn.onclick = () => toggleComments(parseInt(btn.dataset.postId));
-        });
+
           const avatarHtml = profile.avatar_url
             ? `<img src="${profile.avatar_url}">`
             : nick.charAt(0).toUpperCase();
@@ -1648,6 +1640,14 @@
             </div>
           `;
         }).join("");
+        // 绑定点赞/评论事件
+        feedList.querySelectorAll(".post-images-grid img").forEach(img => { img.onclick = () => openImgViewer(img.src); });
+        feedList.querySelectorAll(".like-btn").forEach(btn => {
+          btn.onclick = () => toggleLike(parseInt(btn.dataset.postId));
+        });
+        feedList.querySelectorAll(".comment-btn").forEach(btn => {
+          btn.onclick = () => toggleComments(parseInt(btn.dataset.postId));
+        });
       } catch (e) {
         $("feedList").innerHTML = `<div class="empty">加载失败：${escapeHtml(e.message)}</div>`;
       }
@@ -1831,6 +1831,10 @@
       } catch (err) { alert("图片处理失败"); }
     };
     $("imgViewer").onclick = () => $("imgViewer").classList.add("hidden");
+    document.addEventListener("click", (e) => {
+      const img = e.target.closest(".post-images-grid img");
+      if (img) { e.stopPropagation(); openImgViewer(img.src); }
+    });
     function openImgViewer(src) { $("imgViewerImg").src = src; $("imgViewer").classList.remove("hidden"); }
     renderPostImages();
 
@@ -3364,5 +3368,6 @@
       else renderUnauthed();
     })();
   </script>
+  <div class="img-viewer hidden" id="imgViewer"><img id="imgViewerImg" alt=""></div>
 </body>
 </html>
